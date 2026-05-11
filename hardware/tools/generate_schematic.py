@@ -82,174 +82,145 @@ SOT23  = "Package_TO_SOT_SMD:SOT-23"
 SOT235 = "Package_TO_SOT_SMD:SOT-23-5"
 
 # ---------------------------------------------------------------------------
-# Component list   (ref, lib_id, value, footprint, x, y, angle, dnp)
-# Coordinates in mm on A3 sheet (420 x 297).
-# Zones: Analog x=15-95 | EC(DNP) x=95-165 | Digital x=165-280
-#        PIR-gate x=255-285 | Relay x=295-385 | Connectors y=215-260
+# Component list  —  A3 sheet (420 × 297 mm)
+# Zones: Analog x=18-115 | EC(DNP) x=125-188 | Digital x=200-330
+#        PIR x=338-368 | Relay x=373-418 | Connectors y=228-258
+# Spacing: passives ~18 mm apart, ICs ~30 mm, Pico W isolated at right
 # ---------------------------------------------------------------------------
 COMPONENTS = [
 
-    # ── ANALOG ZONE ─────────────────────────────────────────────────────────
+    # ── ANALOG ZONE ──────────────────────────────────────────────────────────
     sym("Connector_Coaxial:BNC_Jack",
         "J1", "5-1634500-1",
         "Connector_Coaxial:BNC_TE-Connectivity_1-1634500-1_Horizontal",
-        15, 65),
+        18, 75),
 
-    sym("Device:R", "R1", "10M", R, 35, 58),
-    sym("Device:R", "R2", "10M", R, 35, 72),   # 2nd 10 MΩ per BOM qty=2
+    sym("Device:R", "R1", "10M",  R, 42, 68),
+    sym("Device:R", "R2", "10M",  R, 42, 88),
 
-    sym("Diode:BAV99",
-        "D1", "BAV99",
-        SOT23,
-        52, 65),
+    sym("Diode:BAV99",          "D1", "BAV99",          SOT23,  65, 75),
+    sym("Amplifier_Operational:AD8603", "U4", "AD8603ARTZ-R2", SOT235, 92, 75),
+    sym("Device:C", "C2", "100nF", C_0603, 115, 68),   # AD8603 VS+
 
-    sym("Amplifier_Operational:AD8603",
-        "U4", "AD8603ARTZ-R2",
-        SOT235,
-        75, 65),
+    # VREF divider + AD8603 summing node (100 kΩ × 4 per BOM)
+    sym("Device:R", "R3", "100k", R, 48, 115),
+    sym("Device:R", "R4", "100k", R, 70, 115),
+    sym("Device:R", "R5", "100k", R, 48, 133),
+    sym("Device:R", "R6", "100k", R, 70, 133),
+    sym("Device:C", "C1", "100nF", C_0603, 95, 120),   # VREF_MID filter
 
-    sym("Regulator_Linear:AP2112K-3.3",
-        "U5", "AP2112K-3.3TRG1",
-        SOT235,
-        35, 108),
+    # LDO + bulk caps
+    sym("Regulator_Linear:AP2112K-3.3", "U5", "AP2112K-3.3TRG1", SOT235, 35, 168),
+    sym("Device:C", "C14", "10uF",  C_0805, 18,  180),
+    sym("Device:C", "C15", "10uF",  C_0805, 38,  180),
+    sym("Device:C", "C17", "1uF",   C_0603, 58,  180),
+    sym("Device:C", "C18", "1uF",   C_0603, 78,  180),
 
-    # VREF divider + AD8603 summing (100 kΩ × 4 per BOM)
-    sym("Device:R", "R3", "100k", R, 52, 90),
-    sym("Device:R", "R4", "100k", R, 67, 90),
-    sym("Device:R", "R5", "100k", R, 52, 102),  # BOM qty 4 → extra 100k
-    sym("Device:R", "R6", "100k", R, 67, 102),
-
-    sym("Device:C", "C1",  "100nF", C_0603, 83, 90),   # VREF_MID filter
-    sym("Device:C", "C2",  "100nF", C_0603, 83, 65),   # AD8603 VS+
-    sym("Device:C", "C14", "10uF",  C_0805, 22, 118),  # AP2112K bulk in
-    sym("Device:C", "C15", "10uF",  C_0805, 37, 118),  # AP2112K bulk out
-    sym("Device:C", "C17", "1uF",   C_0603, 52, 118),  # AP2112K out stab
-    sym("Device:C", "C18", "1uF",   C_0603, 65, 118),  # AP2112K in stab
-
-    # ── EC ZONE  (all DNP v1) ────────────────────────────────────────────────
-    sym("Sensor:LMP91200",   # search manually if missing; DNP anyway
+    # ── EC ZONE  (all DNP v1) ─────────────────────────────────────────────────
+    sym("Sensor:LMP91200",
         "U3", "LMP91200SD/NOPB",
         "Package_SO:SOIC-14_3.9x8.65mm_P1.27mm",
-        118, 152, dnp=True),
+        155, 168, dnp=True),
 
-    sym("Device:R", "R15", "10k", R,  95, 143, dnp=True),  # EC PWM RC A
-    sym("Device:R", "R16", "10k", R,  95, 157, dnp=True),  # EC PWM RC B
-    sym("Device:C", "C3",  "100nF", C_0603, 106, 143, dnp=True),
-    sym("Device:C", "C4",  "100nF", C_0603, 106, 157, dnp=True),
-    sym("Device:C", "C5",  "100nF", C_0603, 130, 140, dnp=True),  # LMP VDD
+    sym("Device:R", "R15", "10k", R,       125, 155, dnp=True),
+    sym("Device:R", "R16", "10k", R,       125, 173, dnp=True),
+    sym("Device:C", "C3",  "100nF", C_0603, 140, 155, dnp=True),
+    sym("Device:C", "C4",  "100nF", C_0603, 140, 173, dnp=True),
+    sym("Device:C", "C5",  "100nF", C_0603, 168, 145, dnp=True),
 
-    # ── DIGITAL ZONE ────────────────────────────────────────────────────────
+    # ── DIGITAL ZONE ──────────────────────────────────────────────────────────
+    sym("Sensor_Optical:VEML7700",
+        "U6", "VEML7700-TT",
+        "Package_DFN_QFN:DFN-6-1EP_2x2mm_P0.65mm_EP0.7x1.6mm",
+        205, 52),
+    sym("Device:C", "C9", "100nF", C_0603, 228, 52),   # VEML VCC
+
     sym("Analog_ADC:ADS1115xDGS",
         "U2", "ADS1115IDGSR",
         "Package_SO:VSSOP-10_3x3mm_P0.5mm",
-        150, 78),
+        205, 108),
+    sym("Device:R", "R10", "4k7", R,       192, 80),   # I2C SDA pullup
+    sym("Device:R", "R11", "4k7", R,       215, 80),   # I2C SCL pullup
+    sym("Device:C", "C7",  "100nF", C_0603, 192, 120), # ADS VDD
+    sym("Device:C", "C8",  "100nF", C_0603, 215, 120), # ADS AVDD
+    sym("Device:C", "C6",  "100nF", C_0603, 240, 120), # NTC AIN1 anti-alias
 
-    sym("Sensor_Optical:VEML7700",  # search manually if missing
-        "U6", "VEML7700-TT",
-        "Package_DFN_QFN:DFN-6-1EP_2x2mm_P0.65mm_EP0.7x1.6mm",
-        150, 44),
+    # Misc 10 kΩ: NTC pullup, DHT pullup, PIR pullup, SPI-idle × 4
+    sym("Device:R", "R7",  "10k", R, 205, 188),
+    sym("Device:R", "R19", "10k", R, 223, 188),
+    sym("Device:R", "R20", "10k", R, 241, 188),
+    sym("Device:R", "R21", "10k", R, 259, 188),
+    sym("Device:R", "R22", "10k", R, 277, 188),
 
-    sym("Device:R", "R10", "4k7", R, 140, 58),  # I2C SDA pullup
-    sym("Device:R", "R11", "4k7", R, 155, 58),  # I2C SCL pullup
-
-    sym("Device:C", "C6",  "100nF", C_0603, 168, 90),  # NTC AIN1 anti-alias
-    sym("Device:C", "C7",  "100nF", C_0603, 140, 85),  # ADS1115 VDD decouple
-    sym("Device:C", "C8",  "100nF", C_0603, 154, 85),  # ADS1115 AVDD decouple
-    sym("Device:C", "C9",  "100nF", C_0603, 164, 44),  # VEML7700 VCC decouple
-
+    # Pico W — placed right of ADS1115, plenty of clearance
     sym("MCU_RaspberryPi_RP2040:RaspberryPi_PicoW",
         "U1", "PicoW",
         "MicrocontrollerBoard:RaspberryPi_PicoW",
-        225, 130),
+        305, 138),
+    sym("Device:C", "C13", "10uF",  C_0805, 258, 60),
+    sym("Device:C", "C11", "100nF", C_0603, 275, 60),
+    sym("Device:C", "C12", "100nF", C_0603, 292, 60),
 
-    sym("Device:C", "C11", "100nF", C_0603, 203, 58),  # Pico VSYS decouple
-    sym("Device:C", "C12", "100nF", C_0603, 217, 58),
-    sym("Device:C", "C13", "10uF",  C_0805, 190, 58),  # Pico VSYS bulk
-
-    # 10 kΩ misc: NTC pullup, DHT pullup, PIR pullup, SPI-idle (7 total)
-    # R7 reused for NTC pullup; R5-R6 already used above for 100k;
-    # BOM R5-R9 group (10k, qty 7) mapped to R7 + R19-R24 here to avoid clash
-    sym("Device:R", "R7",  "10k", R, 192, 148),  # NTC pullup (3V3_ANA → AIN1)
-    sym("Device:R", "R19", "10k", R, 206, 148),  # DHT22 data pullup
-    sym("Device:R", "R20", "10k", R, 220, 148),  # PIR data pullup
-    sym("Device:R", "R21", "10k", R, 234, 148),  # SPI idle / misc
-    sym("Device:R", "R22", "10k", R, 248, 148),  # spare (BOM qty 7 = 5 above + R7 + R17)
-
-    # ── PIR POWER GATE ───────────────────────────────────────────────────────
+    # ── PIR POWER GATE ────────────────────────────────────────────────────────
     sym("Transistor_FET:BSS84",
         "Q2", "BSS84PXUMA1",
         SOT23,
-        268, 90),
+        350, 128),
+    sym("Device:R", "R17", "10k", R, 338, 112),        # gate pullup
 
-    sym("Device:R", "R17", "10k", R, 258, 78),  # gate pullup to 3V3_DIG
+    # ── RELAY ZONE ────────────────────────────────────────────────────────────
+    sym("Device:D",          "D2", "1N4148W",       "Diode_SMD:D_SOD-123", 380, 65),
+    sym("Device:Relay_SPDT", "K1", "SRD-05VDC-SL-C",
+        "Relay_THT:Relay_SPDT_Songle_SRD-xxVDC-SL-C", 400, 95),
+    sym("Transistor_BJT:BC817", "Q1", "BC817-40",   SOT23,  373, 118),
+    sym("Device:R", "R8",  "1k", R, 358, 118),         # relay base drive
+    sym("Device:R", "R12", "1k", R, 373, 138),
+    sym("Device:R", "R13", "1k", R, 390, 138),
+    sym("Device:R", "R14", "1k", R, 407, 138),
+    sym("Device:C", "C16", "10uF",  C_0805, 415, 80),
+    sym("Device:C", "C10", "100nF", C_0603, 415, 100),
 
-    # ── RELAY ZONE ───────────────────────────────────────────────────────────
-    sym("Device:Relay_SPDT",
-        "K1", "SRD-05VDC-SL-C",
-        "Relay_THT:Relay_SPDT_Songle_SRD-xxVDC-SL-C",
-        338, 72),
-
-    sym("Transistor_BJT:BC817",
-        "Q1", "BC817-40",
-        SOT23,
-        312, 92),
-
-    sym("Device:D",
-        "D2", "1N4148W",
-        "Diode_SMD:D_SOD-123",
-        322, 57),
-
-    sym("Device:R", "R8",  "1k", R, 298, 92),   # relay base drive
-    sym("Device:R", "R12", "1k", R, 312, 107),  # misc 1k
-    sym("Device:R", "R13", "1k", R, 326, 107),
-    sym("Device:R", "R14", "1k", R, 340, 107),
-
-    sym("Device:C", "C10", "100nF", C_0603, 355, 90),  # relay zone decouple
-    sym("Device:C", "C16", "10uF",  C_0805, 355, 72),  # relay VSYS bulk
-
-    # ── CONNECTORS ───────────────────────────────────────────────────────────
+    # ── CONNECTORS  (45 mm spacing) ───────────────────────────────────────────
     sym("Connector_Generic:Conn_01x03", "J2", "Wago-DS18B20",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        18, 240),
+        18, 248),
     sym("Connector_Generic:Conn_01x03", "J3", "Wago-DHT22",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        52, 240),
+        63, 248),
     sym("Connector_Generic:Conn_01x03", "J4", "Wago-PIR",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        86, 240),
+        108, 248),
     sym("Connector_Generic:Conn_01x03", "J5", "Wago-GP16",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        120, 240),
+        153, 248),
     sym("Connector_Generic:Conn_01x03", "J6", "Wago-GP17",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        154, 240),
+        198, 248),
     sym("Connector_Generic:Conn_01x03", "J7", "Wago-Relay",
         "TerminalBlock_Wago:TerminalBlock_Wago_2060-453_1x03_P5.00mm_Horizontal",
-        338, 240),
+        398, 248),
 
     sym("Connector_Generic:Conn_01x04", "J8", "Phoenix-EC4pin",
         "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5_4-3,5-H_1x04_P3.50mm_Horizontal",
-        115, 215),
-
+        150, 228),
     sym("Connector_Generic:Conn_01x02", "J9", "Phoenix-Power",
         "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5_2-5,0-H_1x02_P5.00mm_Horizontal",
-        255, 240),
-
+        298, 248),
     sym("Connector_Generic:Conn_01x04", "HDR1", "Debug-UART",
         "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-        220, 240),
+        253, 248),
 ]
 
 NOTES = [
-    note("ANALOG ZONE", 15, 26, bold=True),
-    note("EC ZONE  (DNP v1 — see schematic.md for v2 AD5933 plan)", 93, 126, bold=True),
-    note("DIGITAL ZONE", 148, 26, bold=True),
-    note("PIR GATE", 252, 68, bold=True),
-    note("RELAY ZONE", 293, 42, bold=True),
-    note("CONNECTORS", 15, 225, bold=True),
-    note("After opening: Tools > Update Symbols from Library", 15, 270),
-    note("Wire per hardware/docs/schematic.md", 15, 276),
-    note("U3 (LMP91200) + U6 (VEML7700) may need manual symbol search", 15, 282),
+    note("ANALOG ZONE",                                        18,  40, bold=True),
+    note("EC ZONE  (DNP v1 — AD5933 redesign for v2)",        125, 138, bold=True),
+    note("DIGITAL ZONE",                                       200,  35, bold=True),
+    note("PIR GATE",                                           334,  95, bold=True),
+    note("RELAY ZONE",                                         368,  45, bold=True),
+    note("CONNECTORS",                                          18, 232, bold=True),
+    note("After opening: Tools > Update Symbols from Library",  18, 270),
+    note("Wire per hardware/docs/schematic.md",                 18, 278),
+    note("U3 (LMP91200) + U6 (VEML7700) may need manual symbol search", 18, 286),
 ]
 
 # ---------------------------------------------------------------------------
