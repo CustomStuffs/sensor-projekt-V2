@@ -14,6 +14,7 @@ async def get_db() -> aiosqlite.Connection:
     if _conn is None:
         _conn = await aiosqlite.connect(_DB_PATH)
         _conn.row_factory = aiosqlite.Row
+        await _conn.execute("PRAGMA foreign_keys = ON")
         await _init_schema(_conn)
     return _conn
 
