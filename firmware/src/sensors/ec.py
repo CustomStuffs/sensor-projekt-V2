@@ -13,6 +13,7 @@ import time
 _NTC_R0   = 10000.0   # NTC nominal resistance at 25 °C
 _NTC_B    = 3950.0    # NTC B-constant
 _PULLUP_R = 10000.0   # pull-up resistor
+_NTC_VCC  = 3.3       # NTC pull-up rail (3V3_ANA), distinct from LMP ref (1.65 V)
 
 
 def _ntc_temp_c(ads, ref_voltage):
@@ -61,7 +62,7 @@ def read(ads, lmp, cal, pwm_a, pwm_b):
     tia_gain = 35000.0
     ec_raw = (v_diff / tia_gain) * cell_k * 1e6   # µS/cm
 
-    temp_c = _ntc_temp_c(ads, ref_v)
+    temp_c = _ntc_temp_c(ads, _NTC_VCC)
     if temp_c is not None:
         # Linear temp compensation: 2% per °C
         ec_raw = ec_raw / (1.0 + 0.02 * (temp_c - ref_t))
