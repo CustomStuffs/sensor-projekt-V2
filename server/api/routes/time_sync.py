@@ -1,11 +1,10 @@
 import time
 from fastapi import APIRouter
 from api.models import TimeSyncRequest, TimeSyncResponse
+from config.settings import POLL_INTERVAL_S
 from storage.database import get_db
 
 router = APIRouter()
-
-_DEFAULT_INTERVAL_S = 1800
 
 
 @router.post("/api/time", response_model=TimeSyncResponse)
@@ -20,5 +19,5 @@ async def post_time(req: TimeSyncRequest):
     await db.commit()
     return TimeSyncResponse(
         unix_ts=now,
-        config={"interval_s": _DEFAULT_INTERVAL_S}
+        config={"interval_s": POLL_INTERVAL_S}
     )

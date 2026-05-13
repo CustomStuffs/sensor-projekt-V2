@@ -7,3 +7,4 @@ DASHBOARD_DIR = os.environ.get(
     "DASHBOARD_DIR",
     os.path.join(os.path.dirname(__file__), "..", "..", "dashboard")
 )
+POLL_INTERVAL_S = int(os.environ.get("POLL_INTERVAL_S", 1800))
