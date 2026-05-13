@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
 
 
 class TimeSyncRequest(BaseModel):
@@ -37,7 +37,7 @@ class ReadingsUploadResponse(BaseModel):
 
 class CommandRequest(BaseModel):
     device_id: str
-    action: str
+    action: Literal["relay_on", "relay_off"]
     duration_s: Optional[int] = None
 
 
