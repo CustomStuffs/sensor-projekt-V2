@@ -48,7 +48,7 @@ def read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c):
     reading = {}
 
     if s["ph"]["enabled"]:
-        reading["ph"] = ph_sensor.read(ads, cal["ph"])
+        reading["ph"] = ph_sensor.read(ads, cal["ph"], channel=s["ph"]["ads_channel"])
 
     if s["ec"]["enabled"]:
         reading["ec_us"] = ec_sensor.read(ads, lmp, cal["ec"], pwm_a, pwm_b)

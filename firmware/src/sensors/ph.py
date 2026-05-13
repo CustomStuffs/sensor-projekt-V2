@@ -1,13 +1,13 @@
 """pH sensor — ADS1115 AIN0, 2-point linear calibration."""
 
 
-def read(ads, cal):
+def read(ads, cal, channel=0):
     """
     Return pH float or None on error.
     cal = { "v_at_ph4": float, "v_at_ph7": float }
     """
     try:
-        v = ads.read_voltage(0)
+        v = ads.read_voltage(channel)
     except Exception:
         return None
 
