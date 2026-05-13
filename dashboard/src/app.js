@@ -26,6 +26,9 @@ function updateLastSeen(ts) {
 
 async function refresh() {
   if (!currentDevice) return;
+  const { devices } = await api.devices();
+  const dev = devices.find(d => d.id === currentDevice);
+  if (dev) updateLastSeen(dev.last_seen);
   await updateChart(currentDevice, currentHours);
 }
 
