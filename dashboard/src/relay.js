@@ -1,7 +1,5 @@
 import { api } from "./api.js";
 
-let _deviceId = null;
-
 export function initRelay(getDeviceId) {
   document.getElementById("btn-relay-on").addEventListener("click", async () => {
     const id = getDeviceId();
