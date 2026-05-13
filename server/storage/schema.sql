@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS readings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_readings_device_ts ON readings(device_id, ts);
+CREATE INDEX IF NOT EXISTS idx_commands_device_pending ON commands(device_id, acked_at, created_at);
 
 CREATE TABLE IF NOT EXISTS commands (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
