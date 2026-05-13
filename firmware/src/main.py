@@ -77,7 +77,7 @@ def read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c):
     return reading
 
 
-def run_upload_cycle(cfg, reading, buf):
+def run_upload_cycle(cfg, reading, buf, ack_id=None):
     """Connect WiFi, time-sync, upload buffer + current reading, poll commands.
     Returns (commands, new_interval_s) — new_interval_s is None if unchanged.
     """
@@ -92,6 +92,9 @@ def run_upload_cycle(cfg, reading, buf):
 
     uptime = power.uptime_ms()
     new_interval_s = time_sync.sync(srv["url"], cfg["device_id"], uptime, timeout_s=srv["timeout_s"])
+
+    if ack_id is not None:
+        protocol.ack_command(srv["url"], ack_id, srv)
 
     readings_to_send = buf.peek_all() + [reading]
     stored = protocol.upload_readings(
@@ -109,7 +112,9 @@ def run_upload_cycle(cfg, reading, buf):
 
 
 def handle_relay(commands, relay, reading, cfg):
-    """Execute server command (manual override) or fire auto-rules."""
+    """Execute server command (manual override) or fire auto-rules.
+    Returns the executed command id, or None if no server command ran.
+    """
     if commands:
         cmd = commands[0]
         action = cmd.get("action")
@@ -118,13 +123,12 @@ def handle_relay(commands, relay, reading, cfg):
             relay.on(duration)
         elif action == "relay_off":
             relay.off()
-        # ACK is sent next cycle when WiFi reconnects; command id stored would
-        # need a small queue — kept simple here by polling after each cycle.
-        return
+        return cmd.get("id")
 
     rule = evaluate(cfg["relay_rules"], reading)
     if rule and rule["action"] == "relay_on":
         relay.on(rule["duration_s"])
+    return None
 
 
 def main():
@@ -134,16 +138,17 @@ def main():
     buf = RingBuffer(max_slots=cfg["storage"]["buffer_slots"])
 
     interval_s = cfg["poll_interval_s"]
+    ack_id = None
 
     while True:
         led.value(1)
         reading = read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c)
         print("Reading:", reading)
 
-        commands, new_interval_s = run_upload_cycle(cfg, reading, buf)
+        commands, new_interval_s = run_upload_cycle(cfg, reading, buf, ack_id)
         if new_interval_s is not None:
             interval_s = new_interval_s
-        handle_relay(commands, relay, reading, cfg)
+        ack_id = handle_relay(commands, relay, reading, cfg)
 
         led.value(0)
         power.sleep(interval_s, relay=relay)
