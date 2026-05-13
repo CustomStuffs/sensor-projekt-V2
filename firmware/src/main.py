@@ -30,7 +30,7 @@ def init_hardware(cfg):
     ads = ADS1115(i2c)
 
     spi = SPI(0, baudrate=1_000_000, polarity=0, phase=0,
-              sck=Pin(4), mosi=Pin(5), miso=Pin(6))
+              sck=Pin(6), mosi=Pin(5), miso=Pin(4))
     cs = Pin(7, Pin.OUT, value=1)
     lmp = LMP91200(spi, cs)
 
@@ -142,7 +142,7 @@ def main():
         handle_relay(commands, relay, reading, cfg)
 
         led.value(0)
-        power.sleep(interval_s)
+        power.sleep(interval_s, relay=relay)
 
 
 main()
