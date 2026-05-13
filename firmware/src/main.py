@@ -133,7 +133,16 @@ def handle_relay(commands, relay, reading, cfg):
 
 def main():
     led = Pin("LED", Pin.OUT)
-    cfg = load_config()
+    try:
+        cfg = load_config()
+    except Exception as e:
+        print("config.json load failed:", e)
+        while True:
+            for _ in range(5):
+                led.value(1); time.sleep_ms(100)
+                led.value(0); time.sleep_ms(100)
+            time.sleep_ms(2000)
+
     ads, lmp, pwm_a, pwm_b, relay, i2c = init_hardware(cfg)
     buf = RingBuffer(max_slots=cfg["storage"]["buffer_slots"])
 
