@@ -32,7 +32,8 @@ export function initChart() {
 export async function updateChart(deviceId, hours) {
   const now = Math.floor(Date.now() / 1000);
   const from = now - hours * 3600;
-  const { readings } = await api.readings(deviceId, from, now);
+  const limit = Math.min(hours * 4, 2000);   // 4 readings/hr headroom, server max 2000
+  const { readings } = await api.readings(deviceId, from, now, limit);
 
   const active = new Set(
     [...document.querySelectorAll("[data-sensor]:checked")].map(el => el.dataset.sensor)

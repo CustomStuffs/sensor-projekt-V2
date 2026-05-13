@@ -7,15 +7,23 @@ let currentHours = 24;
 
 function getDeviceId() { return currentDevice; }
 
+function showError(msg) { document.getElementById("error-banner").textContent = msg; }
+function clearError()   { document.getElementById("error-banner").textContent = ""; }
+
 async function loadDevices() {
-  const { devices } = await api.devices();
-  const select = document.getElementById("device-select");
-  select.innerHTML = devices.map(d =>
-    `<option value="${d.id}">${d.id}</option>`
-  ).join("");
-  if (devices.length) {
-    currentDevice = devices[0].id;
-    updateLastSeen(devices[0].last_seen);
+  try {
+    const { devices } = await api.devices();
+    const select = document.getElementById("device-select");
+    select.innerHTML = devices.map(d =>
+      `<option value="${d.id}">${d.id}</option>`
+    ).join("");
+    if (devices.length) {
+      currentDevice = devices[0].id;
+      updateLastSeen(devices[0].last_seen);
+    }
+    clearError();
+  } catch (e) {
+    showError("Could not reach server: " + e.message);
   }
 }
 
@@ -26,10 +34,15 @@ function updateLastSeen(ts) {
 
 async function refresh() {
   if (!currentDevice) return;
-  const { devices } = await api.devices();
-  const dev = devices.find(d => d.id === currentDevice);
-  if (dev) updateLastSeen(dev.last_seen);
-  await updateChart(currentDevice, currentHours);
+  try {
+    const { devices } = await api.devices();
+    const dev = devices.find(d => d.id === currentDevice);
+    if (dev) updateLastSeen(dev.last_seen);
+    await updateChart(currentDevice, currentHours);
+    clearError();
+  } catch (e) {
+    showError("Refresh failed: " + e.message);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
