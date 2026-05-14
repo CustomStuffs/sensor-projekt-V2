@@ -21,6 +21,11 @@ CREATE TABLE IF NOT EXISTS readings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_readings_device_ts ON readings(device_id, ts);
+
+CREATE TABLE IF NOT EXISTS device_config (
+    device_id      TEXT PRIMARY KEY REFERENCES devices(id),
+    relay_schedule TEXT NOT NULL DEFAULT '[]'
+);
 CREATE INDEX IF NOT EXISTS idx_commands_device_pending ON commands(device_id, acked_at, created_at);
 
 CREATE TABLE IF NOT EXISTS commands (

@@ -18,7 +18,7 @@ import sensors.water_level as water_level_sensor
 from communication import wifi, time_sync, protocol
 from storage.ringbuffer import RingBuffer
 from power import manager as power
-from automation.rules import evaluate
+from automation.rules import evaluate, evaluate_schedule
 
 
 def load_config():
@@ -99,7 +99,7 @@ def run_upload_cycle(cfg, reading, buf, ack_id=None):
         return [], None
 
     uptime = power.uptime_ms()
-    new_interval_s = time_sync.sync(srv["url"], cfg["device_id"], uptime, timeout_s=srv["timeout_s"])
+    new_cfg = time_sync.sync(srv["url"], cfg["device_id"], uptime, timeout_s=srv["timeout_s"])
 
     if ack_id is not None:
         protocol.ack_command(srv["url"], ack_id, srv)
@@ -116,7 +116,7 @@ def run_upload_cycle(cfg, reading, buf, ack_id=None):
 
     commands = protocol.poll_commands(srv["url"], cfg["device_id"], srv)
     wifi.disconnect()
-    return commands, new_interval_s
+    return commands, new_cfg
 
 
 def handle_relay(commands, relay, reading, cfg):
@@ -133,6 +133,15 @@ def handle_relay(commands, relay, reading, cfg):
             relay.off()
         return cmd.get("id")
 
+    # Time-based schedule (highest priority after manual commands)
+    schedule = cfg.get("relay_schedule", [])
+    if schedule:
+        rule = evaluate_schedule(schedule, reading, reading.get("ts", 0))
+        if rule:
+            relay.on(rule["duration_s"])
+            return None
+
+    # Sensor threshold fallback
     rule = evaluate(cfg["relay_rules"], reading)
     if rule and rule["action"] == "relay_on":
         relay.on(rule["duration_s"])
@@ -162,9 +171,12 @@ def main():
         reading = read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c)
         print("Reading:", reading)
 
-        commands, new_interval_s = run_upload_cycle(cfg, reading, buf, ack_id)
-        if new_interval_s is not None:
-            interval_s = new_interval_s
+        commands, new_cfg = run_upload_cycle(cfg, reading, buf, ack_id)
+        if new_cfg:
+            if "interval_s" in new_cfg:
+                interval_s = new_cfg["interval_s"]
+            if "relay_schedule" in new_cfg:
+                cfg["relay_schedule"] = new_cfg["relay_schedule"]
         ack_id = handle_relay(commands, relay, reading, cfg)
 
         led.value(0)

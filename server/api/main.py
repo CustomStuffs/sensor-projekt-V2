@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import os
 
-from api.routes import time_sync, readings, commands
+from api.routes import time_sync, readings, commands, schedule
 from storage.database import close_db
 from config.settings import DASHBOARD_DIR
 
@@ -30,6 +30,7 @@ app = FastAPI(title="Sensor Hub", lifespan=lifespan)
 app.include_router(time_sync.router)
 app.include_router(readings.router)
 app.include_router(commands.router)
+app.include_router(schedule.router)
 
 # Serve dashboard static files at root — must come after API routes
 _dash = os.path.abspath(DASHBOARD_DIR)

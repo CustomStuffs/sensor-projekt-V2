@@ -9,11 +9,13 @@ async function req(method, path, body) {
 }
 
 export const api = {
-  devices: ()                         => req("GET", "/api/devices"),
-  readings: (deviceId, from, to, limit = 500) => req("GET",
+  devices: ()                               => req("GET", "/api/devices"),
+  readings: (deviceId, from, to, limit=500) => req("GET",
     `/api/readings?device_id=${deviceId}&from=${from}&to=${to}&limit=${limit}`),
-  relayOn: (deviceId, duration_s)     => req("POST", "/api/commands",
+  relayOn:  (deviceId, duration_s)          => req("POST", "/api/commands",
     { device_id: deviceId, action: "relay_on", duration_s }),
-  relayOff: (deviceId)                => req("POST", "/api/commands",
+  relayOff: (deviceId)                      => req("POST", "/api/commands",
     { device_id: deviceId, action: "relay_off" }),
+  getSchedule:  (deviceId)                  => req("GET",  `/api/schedule/${deviceId}`),
+  saveSchedule: (deviceId, schedule)        => req("POST", `/api/schedule/${deviceId}`, { schedule }),
 };

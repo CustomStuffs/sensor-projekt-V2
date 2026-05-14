@@ -1,3 +1,4 @@
+import json
 import time
 from fastapi import APIRouter
 from api.models import TimeSyncRequest, TimeSyncResponse
@@ -17,7 +18,14 @@ async def post_time(req: TimeSyncRequest):
         (req.device_id, now)
     )
     await db.commit()
+
+    async with db.execute(
+        "SELECT relay_schedule FROM device_config WHERE device_id = ?", (req.device_id,)
+    ) as cur:
+        row = await cur.fetchone()
+    schedule = json.loads(row["relay_schedule"]) if row else []
+
     return TimeSyncResponse(
         unix_ts=now,
-        config={"interval_s": POLL_INTERVAL_S}
+        config={"interval_s": POLL_INTERVAL_S, "relay_schedule": schedule}
     )

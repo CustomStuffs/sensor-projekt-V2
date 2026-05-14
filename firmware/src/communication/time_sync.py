@@ -28,7 +28,7 @@ def sync(server_url, device_id, uptime_ms, timeout_s=10):
             t = time.gmtime(unix_ts)
             machine.RTC().datetime((t[0], t[1], t[2], t[6], t[3], t[4], t[5], 0))
 
-        return data.get("config", {}).get("interval_s")
+        return data.get("config", {})
     except Exception as e:
         print("time_sync error:", e)
         return None

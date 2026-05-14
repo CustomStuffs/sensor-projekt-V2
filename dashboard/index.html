@@ -25,10 +25,11 @@
       <div id="sensor-toggles">
         <label><input type="checkbox" data-sensor="temp_c"       checked /> Temperature</label>
         <label><input type="checkbox" data-sensor="humidity_pct" checked /> Humidity</label>
-        <label><input type="checkbox" data-sensor="ph"           checked /> pH</label>
-        <label><input type="checkbox" data-sensor="ec_us"        checked /> EC</label>
-        <label><input type="checkbox" data-sensor="lux"                 /> Light</label>
-        <label><input type="checkbox" data-sensor="soil_pct"    checked /> Soil</label>
+        <label><input type="checkbox" data-sensor="ph"                   /> pH</label>
+        <label><input type="checkbox" data-sensor="ec_us"                /> EC</label>
+        <label><input type="checkbox" data-sensor="lux"                  /> Light</label>
+        <label><input type="checkbox" data-sensor="soil_pct"    checked  /> Soil</label>
+        <label><input type="checkbox" data-sensor="water_level" checked  /> Water Level</label>
       </div>
       <div id="time-range">
         <button data-hours="6">6 h</button>
@@ -40,14 +41,59 @@
 
     <section id="relay-section">
       <h2>Relay</h2>
-      <div id="relay-controls">
-        <button id="btn-relay-on">ON (5 min)</button>
-        <button id="btn-relay-off">OFF</button>
-        <input type="number" id="relay-duration" value="300" min="1" max="600" />
-        <label for="relay-duration">seconds</label>
+
+      <div id="manual-override">
+        <h3>Manual Override</h3>
+        <div id="relay-controls">
+          <button id="btn-relay-on">ON</button>
+          <button id="btn-relay-off">OFF</button>
+          <input type="number" id="relay-duration" value="300" min="1" max="600" />
+          <label for="relay-duration">seconds</label>
+        </div>
       </div>
-      <h3>Auto-rules <small>(from config.json)</small></h3>
-      <div id="rules-display"></div>
+
+      <div id="schedule-editor">
+        <h3>Daily Schedule</h3>
+        <table id="schedule-table">
+          <thead>
+            <tr><th>Time</th><th>Duration</th><th>Days</th><th>Skip if</th><th></th></tr>
+          </thead>
+          <tbody id="schedule-rows"></tbody>
+        </table>
+
+        <div id="add-slot-form">
+          <div class="form-row">
+            <label>Time <input type="time" id="slot-time" value="08:00" /></label>
+            <label>Duration <input type="number" id="slot-duration" value="10" min="1" max="120" /> min</label>
+          </div>
+          <div class="form-row">
+            <span class="form-label">Days:</span>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="mon" checked /> Mon</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="tue" checked /> Tue</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="wed" checked /> Wed</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="thu" checked /> Thu</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="fri" checked /> Fri</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="sat" checked /> Sat</label>
+            <label class="day-label"><input type="checkbox" class="day-checkbox" value="sun" checked /> Sun</label>
+          </div>
+          <div class="form-row">
+            <span class="form-label">Skip if:</span>
+            <select id="slot-condition">
+              <option value="none">No condition</option>
+              <option value="soil">Soil moisture ≥</option>
+              <option value="no_water">No water in tank</option>
+            </select>
+            <input type="number" id="slot-condition-value" value="60" min="0" max="100" class="hidden" />
+            <span id="slot-condition-unit" class="hidden">%</span>
+          </div>
+          <button id="btn-add-slot">+ Add Slot</button>
+        </div>
+
+        <div class="schedule-footer">
+          <div id="schedule-status"></div>
+          <button id="btn-save-schedule">Save Schedule</button>
+        </div>
+      </div>
     </section>
   </main>
 

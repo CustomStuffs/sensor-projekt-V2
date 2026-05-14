@@ -1,6 +1,6 @@
 import { api } from "./api.js";
 import { initChart, updateChart } from "./charts.js";
-import { initRelay } from "./relay.js";
+import { initRelay, reloadSchedule } from "./relay.js";
 
 let currentDevice = null;
 let currentHours = 24;
@@ -51,10 +51,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadDevices();
   await refresh();
+  reloadSchedule();
 
   document.getElementById("device-select").addEventListener("change", async e => {
     currentDevice = e.target.value;
     await refresh();
+    reloadSchedule();
   });
 
   document.querySelectorAll("#time-range button").forEach(btn => {
