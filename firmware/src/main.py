@@ -1,5 +1,6 @@
 """Boot and scheduler loop for the Pico W sensor hub."""
 
+import gc
 import json
 import time
 from machine import I2C, SPI, Pin, PWM
@@ -167,19 +168,26 @@ def main():
     ack_id = None
 
     while True:
-        led.value(1)
-        reading = read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c)
-        print("Reading:", reading)
+        try:
+            led.value(1)
+            reading = read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c)
+            print("Reading:", reading)
 
-        commands, new_cfg = run_upload_cycle(cfg, reading, buf, ack_id)
-        if new_cfg:
-            if "interval_s" in new_cfg:
-                interval_s = new_cfg["interval_s"]
-            if "relay_schedule" in new_cfg:
-                cfg["relay_schedule"] = new_cfg["relay_schedule"]
-        ack_id = handle_relay(commands, relay, reading, cfg)
+            commands, new_cfg = run_upload_cycle(cfg, reading, buf, ack_id)
+            if new_cfg:
+                if "interval_s" in new_cfg:
+                    interval_s = new_cfg["interval_s"]
+                if "relay_schedule" in new_cfg:
+                    cfg["relay_schedule"] = new_cfg["relay_schedule"]
+            ack_id = handle_relay(commands, relay, reading, cfg)
+        except Exception as e:
+            import sys
+            sys.print_exception(e)
+        finally:
+            led.value(0)
+            gc.collect()
+            print("free mem:", gc.mem_free())
 
-        led.value(0)
         power.sleep(interval_s, relay=relay)
 
 

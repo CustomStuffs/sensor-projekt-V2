@@ -29,8 +29,9 @@ def sleep(duration_s, relay=None, pir_pin_num=11):
 def _do_sleep(ms):
     try:
         machine.lightsleep(int(ms))
-    except Exception:
-        time.sleep_ms(int(ms))
+    except Exception as e:
+        print("lightsleep unavailable, falling back to time.sleep:", e)
+        time.sleep(ms / 1000)
 
 
 def uptime_ms():
