@@ -21,6 +21,7 @@ class SensorReading(BaseModel):
     lux: Optional[float] = None
     soil_pct: Optional[float] = None
     motion: Optional[bool] = None
+    water_level: Optional[float] = None
 
 
 class ReadingsUpload(BaseModel):

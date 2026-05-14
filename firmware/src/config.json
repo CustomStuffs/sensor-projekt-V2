@@ -18,13 +18,14 @@
   "poll_interval_s": 1800,
 
   "sensors": {
-    "ph":          { "enabled": true,  "ads_channel": 0 },
-    "ec":          { "enabled": true },
-    "temperature": { "enabled": true },
+    "ph":          { "enabled": false, "ads_channel": 0 },
+    "ec":          { "enabled": false },
+    "temperature": { "enabled": false },
     "humidity":    { "enabled": true },
-    "light":       { "enabled": true },
-    "soil":        { "enabled": true,  "ads_channel": 2 },
-    "motion":      { "enabled": true,  "scan_duration_s": 5 }
+    "light":       { "enabled": false },
+    "soil":        { "enabled": true,  "adc_pin": 26 },
+    "motion":      { "enabled": false, "scan_duration_s": 5 },
+    "water_level": { "enabled": true,  "pin": 16 }
   },
 
   "calibration": {
@@ -38,8 +39,8 @@
       "ref_temp_c": 25.0
     },
     "soil": {
-      "dry_count": 26000,
-      "wet_count": 13000
+      "dry_count": 65535,
+      "wet_count": 9600
     }
   },
 

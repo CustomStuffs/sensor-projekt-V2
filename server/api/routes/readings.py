@@ -22,12 +22,12 @@ async def post_readings(upload: ReadingsUpload):
     for r in upload.readings:
         cur = await db.execute(
             """INSERT OR IGNORE INTO readings
-               (device_id, ts, ph, ec_us, temp_c, humidity_pct, lux, soil_pct, motion, vbus_mv)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               (device_id, ts, ph, ec_us, temp_c, humidity_pct, lux, soil_pct, motion, water_level, vbus_mv)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (upload.device_id, r.ts, r.ph, r.ec_us, r.temp_c,
              r.humidity_pct, r.lux, r.soil_pct,
              int(r.motion) if r.motion is not None else None,
-             upload.vbus_mv)
+             r.water_level, upload.vbus_mv)
         )
         stored += cur.rowcount
 

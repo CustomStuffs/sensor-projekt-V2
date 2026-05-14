@@ -1,14 +1,17 @@
-"""Capacitive soil moisture sensor via ADS1115 AIN2."""
+"""Resistive soil moisture sensor on a Pico ADC pin (default GP26)."""
+
+from machine import ADC
 
 
-def read(ads, cal, channel=2):
+def read(cfg, cal):
     """
     Return soil moisture as percentage (0-100) or None on error.
-    cal = { "dry_count": int, "wet_count": int }
-    Higher ADC count = drier (capacitive sensor inverts moisture).
+    cfg = sensors.soil block from config.json  (needs "adc_pin")
+    cal = calibration.soil block               (needs "dry_count", "wet_count")
+    Higher raw count = drier (high resistance = high voltage at ADC pin).
     """
     try:
-        raw = ads.read_raw(channel)
+        raw = ADC(cfg.get("adc_pin", 26)).read_u16()
     except Exception:
         return None
 
@@ -18,5 +21,4 @@ def read(ads, cal, channel=2):
         return None
 
     pct = (dry - raw) / (dry - wet) * 100.0
-    pct = max(0.0, min(100.0, pct))
-    return round(pct, 1)
+    return round(max(0.0, min(100.0, pct)), 1)

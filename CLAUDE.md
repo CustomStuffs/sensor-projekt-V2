@@ -46,7 +46,8 @@ Request: {
     "humidity_pct": 65.2,
     "lux": 850,
     "soil_pct": 45,
-    "motion": false
+    "motion": false,
+    "water_level": 0.0
   }]
 }
 Response: { "ok": true, "stored": 1 }

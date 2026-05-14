@@ -19,8 +19,13 @@ Full workflow documentation: `docs/WORKFLOW.md`
 
 ## MicroPython Version
 
-**1.28+ required.** Use the `RPI_PICO_W` build — not the generic RP2040 build (no WiFi).  
-Download: https://micropython.org/download/RPI_PICO_W/
+**1.28+ required.** This project uses the **Pico W (RP2040)**. Use the `RPI_PICO_W` build — not the generic RP2040 build (no WiFi) and not the Pico 2 W build.
+
+Download page: https://micropython.org/download/RPI_PICO_W/  
+Latest stable: https://micropython.org/resources/firmware/RPI_PICO_W-20260406-v1.28.0.uf2
+
+Flash: hold BOOTSEL, plug USB, release, drag `.uf2` onto the `RPI-RP2` drive.  
+Confirm chip: the `INDEX.HTM` on the bootloader drive should redirect to `raspberrypi.com/device/RP2?version=...` (RP2040). If it says RP2350 you have a Pico 2 W and need the `RPI_PICO2_W` build instead.
 
 ## GPIO Pinout
 

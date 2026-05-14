@@ -23,7 +23,20 @@ async def _init_schema(conn: aiosqlite.Connection):
     with open(_SCHEMA_PATH) as f:
         schema = f.read()
     await conn.executescript(schema)
+    await _migrate(conn)
     await conn.commit()
+
+
+async def _migrate(conn: aiosqlite.Connection):
+    # Each entry is a one-shot ALTER TABLE — silently skipped if column exists.
+    migrations = [
+        "ALTER TABLE readings ADD COLUMN water_level REAL",
+    ]
+    for sql in migrations:
+        try:
+            await conn.execute(sql)
+        except Exception:
+            pass
 
 
 async def close_db():

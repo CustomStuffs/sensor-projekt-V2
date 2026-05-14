@@ -14,6 +14,7 @@ import sensors.humidity as hum_sensor
 import sensors.light as light_sensor
 import sensors.motion as motion_sensor
 import sensors.soil as soil_sensor
+import sensors.water_level as water_level_sensor
 from communication import wifi, time_sync, protocol
 from storage.ringbuffer import RingBuffer
 from power import manager as power
@@ -26,19 +27,24 @@ def load_config():
 
 
 def init_hardware(cfg):
-    i2c = I2C(1, sda=Pin(2), scl=Pin(3), freq=400_000)
-    ads = ADS1115(i2c)
+    s = cfg["sensors"]
+    ads = lmp = pwm_a = pwm_b = i2c = None
 
-    spi = SPI(0, baudrate=1_000_000, polarity=0, phase=0,
-              sck=Pin(6), mosi=Pin(5), miso=Pin(4))
-    cs = Pin(7, Pin.OUT, value=1)
-    lmp = LMP91200(spi, cs)
+    needs_i2c = s.get("ph", {}).get("enabled") or s.get("light", {}).get("enabled")
+    if needs_i2c:
+        i2c = I2C(1, sda=Pin(2), scl=Pin(3), freq=400_000)
+        if s.get("ph", {}).get("enabled"):
+            ads = ADS1115(i2c)
 
-    pwm_a = PWM(Pin(13), freq=2000, duty_u16=0)
-    pwm_b = PWM(Pin(14), freq=2000, duty_u16=0)
+    if s.get("ec", {}).get("enabled"):
+        spi = SPI(0, baudrate=1_000_000, polarity=0, phase=0,
+                  sck=Pin(6), mosi=Pin(5), miso=Pin(4))
+        cs = Pin(7, Pin.OUT, value=1)
+        lmp = LMP91200(spi, cs)
+        pwm_a = PWM(Pin(13), freq=2000, duty_u16=0)
+        pwm_b = PWM(Pin(14), freq=2000, duty_u16=0)
 
     relay = Relay(pin_num=10, max_on_s=cfg["relay"]["max_on_duration_s"])
-
     return ads, lmp, pwm_a, pwm_b, relay, i2c
 
 
@@ -66,12 +72,14 @@ def read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c):
         reading["lux"] = light_sensor.read(i2c)
 
     if s["soil"]["enabled"]:
-        reading["soil_pct"] = soil_sensor.read(ads, cal["soil"],
-                                               channel=s["soil"]["ads_channel"])
+        reading["soil_pct"] = soil_sensor.read(s["soil"], cal["soil"])
 
     if s["motion"]["enabled"]:
         detected = motion_sensor.read(scan_duration_s=s["motion"]["scan_duration_s"])
         reading["motion"] = detected
+
+    if s.get("water_level", {}).get("enabled"):
+        reading["water_level"] = water_level_sensor.read(s["water_level"])
 
     reading["ts"] = time.time()
     return reading
