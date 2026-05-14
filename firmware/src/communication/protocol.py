@@ -78,7 +78,7 @@ def vsys_mv():
     """Read VSYS voltage via Pico W ADC3 (internal 3:1 voltage divider)."""
     try:
         from machine import ADC
-        adc = ADC(3)
+        adc = ADC(29)  # GPIO29 = VSYS/3 divider on Pico W
         v = adc.read_u16() * 3.3 / 65535 * 3
         return round(v * 1000)
     except Exception:
