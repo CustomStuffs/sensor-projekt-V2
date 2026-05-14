@@ -84,6 +84,14 @@ sudo systemctl enable --now sensor_hub
 
 Served as static files by the FastAPI server — no build step. Open `http://<pi-ip>:8080` in a browser.
 
+## Pico W hardware notes
+
+- **VSYS ADC**: use `ADC(29)` (GPIO29), not `ADC(3)`. On Pico W, GPIO29 is the VSYS/3 voltage divider. `ADC(3)` reads GPIO3 (I2C SCL) and gives garbage.
+- **VSYS measurement timing**: read VSYS *before* `wlan.active(True)` — GPIO29 is shared with the WiFi SPI bus and returns wrong values while the radio is up.
+- **Lightsleep after WiFi**: `machine.lightsleep(ms)` can fail silently on Pico W after WiFi use. The firmware falls back to `time.sleep()` automatically and logs when this happens.
+- **Serial monitor**: uses `mpremote` (`bash tools/monitor.sh`), not minicom. On immutable distros (Bazzite/Silverblue), minicom is not available.
+- **Flashing**: the device enters lightsleep ~30 s after boot, making `mpremote` unreachable. Flash immediately after plugging in USB, or interrupt via REPL first.
+
 ## Power budget (battery operation)
 
 | State | Current |
