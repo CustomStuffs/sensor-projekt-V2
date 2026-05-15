@@ -93,7 +93,7 @@ while True:
     n = uart.any()
     if n:
         chunk = uart.read(n)
-        usb_write(chunk.decode("utf-8", "replace"))
+        usb_write(chunk.decode("latin-1"))
 
     # Read USB commands (non-blocking)
     if _poll.poll(0):
