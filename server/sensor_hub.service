@@ -1,19 +1,19 @@
 [Unit]
 Description=Sensor Hub API server
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/sensor_projekt_V2/server
-ExecStart=/home/pi/sensor_projekt_V2/venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8080
+WorkingDirectory=/var/home/mista/Dokumente/sensor_projekt_V2/server
+ExecStart=/var/home/mista/Dokumente/sensor_projekt_V2/venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8080
 Restart=on-failure
 RestartSec=5
 
 # Optional overrides — uncomment and edit as needed:
-# Environment=DB_PATH=/home/pi/sensor_hub.db
+# Environment=DB_PATH=/var/home/mista/Dokumente/sensor_projekt_V2/server/sensor_hub.db
 # Environment=POLL_INTERVAL_S=1800
-# Environment=DASHBOARD_DIR=/home/pi/sensor_projekt_V2/dashboard
+# Environment=DASHBOARD_DIR=/var/home/mista/Dokumente/sensor_projekt_V2/dashboard
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

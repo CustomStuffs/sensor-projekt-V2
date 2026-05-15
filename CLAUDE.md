@@ -29,8 +29,17 @@ Pico W (MicroPython)
 ### POST /api/time — time sync, Pico W calls before every upload
 ```json
 Request:  { "device_id": "pico_001", "uptime_ms": 123456 }
-Response: { "unix_ts": 1748000000, "config": { "interval_s": 1800 } }
+Response: {
+  "unix_ts": 1748000000,
+  "config": {
+    "interval_s": 1800,
+    "relay_schedule": [
+      { "time": "08:00", "duration_s": 600, "days": ["mon","wed","fri"], "skip_if": null }
+    ]
+  }
+}
 ```
+`relay_schedule` is an empty array if no schedule is saved. `skip_if` is null or `{ "sensor": "soil_pct", "op": ">=", "value": 60 }`.
 
 ### POST /api/readings — sensor data upload
 ```json
@@ -70,6 +79,18 @@ Request:  { "device_id": "pico_001", "action": "relay_on", "duration_s": 300 }
 Response: { "id": 42, "queued": true }
 ```
 `action` values: `"relay_on"` | `"relay_off"`
+
+### GET /api/schedule/{device_id} — dashboard fetches saved schedule
+```json
+Response: { "schedule": [{ "time": "08:00", "duration_s": 600, "days": ["mon","wed","fri"], "skip_if": null }] }
+```
+
+### POST /api/schedule/{device_id} — dashboard saves schedule
+```json
+Request:  { "schedule": [{ "time": "08:00", "duration_s": 600, "days": ["mon","wed","fri"], "skip_if": null }] }
+Response: { "ok": true }
+```
+Replaces the full schedule for that device. Firmware receives it on the next `POST /api/time`.
 
 ### GET /api/readings?device_id=pico_001&from=TS&to=TS&limit=500
 ```json
