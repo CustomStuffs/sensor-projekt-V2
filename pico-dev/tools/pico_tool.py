@@ -86,26 +86,36 @@ def cmd_monitor(port: str) -> None:
     Type RESET or SEND:<text> and press Enter while monitoring.
     Ctrl-C exits.
     """
+    interactive = sys.stdin.isatty()
     print(f"[monitor] {port} @ {_BAUD} baud — Ctrl-C to stop")
-    print("[monitor] type  RESET  or  SEND:<text>  to interact\n")
+    if interactive:
+        print("[monitor] type  RESET  or  SEND:<text>  to interact\n")
+    else:
+        print("[monitor] read-only (no TTY)\n")
 
     running = True
 
     def _read_loop(ser: serial.Serial) -> None:
         while running:
-            data = ser.read(256)
-            if data:
-                sys.stdout.buffer.write(data)
-                sys.stdout.buffer.flush()
+            try:
+                data = ser.read(256)
+                if data:
+                    sys.stdout.buffer.write(data)
+                    sys.stdout.buffer.flush()
+            except Exception:
+                break
 
     with _open(port) as ser:
         reader = threading.Thread(target=_read_loop, args=(ser,), daemon=True)
         reader.start()
         try:
-            while True:
-                line = input()               # blocks until user presses Enter
-                ser.write((line + "\r\n").encode())
-        except KeyboardInterrupt:
+            if interactive:
+                while True:
+                    line = input()
+                    ser.write((line + "\r\n").encode())
+            else:
+                reader.join()   # non-TTY: just stream until Ctrl-C
+        except (KeyboardInterrupt, EOFError):
             running = False
             print("\n[monitor] stopped")
 
