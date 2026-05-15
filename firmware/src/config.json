@@ -51,7 +51,8 @@
   "relay_schedule": [],
 
   "relay_rules": [
-    { "sensor": "soil_pct", "op": "<", "value": 30, "action": "relay_on", "duration_s": 300 }
+    { "sensor": "soil_pct", "op": ">=", "value": 60, "action": "relay_off" },
+    { "sensor": "soil_pct", "op": "<",  "value": 30, "action": "relay_on", "duration_s": 300 }
   ],
 
   "storage": {

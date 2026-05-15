@@ -21,8 +21,12 @@ def evaluate(rules, reading):
     Check sensor threshold rules against the latest reading dict.
     Returns the first matching rule dict or None.
     Rule shape: { "sensor", "op", "value", "action", "duration_s" }
+    relay_off rules are checked before relay_on so an upper bound always wins.
     """
-    for rule in rules:
+    off_rules = [r for r in rules if r.get("action") == "relay_off"]
+    on_rules  = [r for r in rules if r.get("action") != "relay_off"]
+
+    for rule in off_rules + on_rules:
         val = reading.get(rule["sensor"])
         if val is None:
             continue

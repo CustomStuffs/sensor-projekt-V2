@@ -144,10 +144,13 @@ def handle_relay(commands, relay, reading, cfg):
             relay.on(rule["duration_s"])
             return None
 
-    # Sensor threshold fallback
+    # Sensor threshold rules — relay_off checked first inside evaluate()
     rule = evaluate(cfg["relay_rules"], reading)
-    if rule and rule["action"] == "relay_on":
-        relay.on(rule["duration_s"])
+    if rule:
+        if rule["action"] == "relay_on":
+            relay.on(rule["duration_s"])
+        elif rule["action"] == "relay_off":
+            relay.off()
     return None
 
 
