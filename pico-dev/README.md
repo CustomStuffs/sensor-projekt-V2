@@ -10,10 +10,12 @@ for the **Project Pico** (running the real firmware, never overwritten directly)
 | GPIO 4 (UART1 TX) | → | GPIO 1 (UART0 RX) |
 | GPIO 5 (UART1 RX) | ← | GPIO 0 (UART0 TX) |
 | GND | — | GND |
-| GPIO 15 → Relay IN | | Relay COM → RUN pin, NO → GND |
+| GPIO 15 → Relay1 IN | | Relay1 COM → RUN pin, NO → GND |
+| GPIO 28 → Relay2 IN | | Relay2 COM/NO → light circuit |
 
-Relay active-LOW: pulling GPIO 15 low closes the relay, which pulls RUN to GND
-and resets the Project Pico.
+Both relays are active-LOW: GPIO LOW = relay closed.
+- Relay1 (GPIO 15): pulls Project Pico RUN to GND → hard reset.
+- Relay2 (GPIO 28): controls the light switch circuit.
 
 ## Quick Start
 
@@ -76,8 +78,11 @@ These are the raw commands the Machine Pico understands over its USB serial.
 
 | Command | Effect |
 |---|---|
-| `RESET` | Closes relay 100 ms → Project Pico RUN → GND → hard reset |
+| `RESET` | Closes relay1 100 ms → Project Pico RUN → GND → hard reset |
 | `SEND:<text>` | Sends `<text>\r\n` to Project Pico via UART |
+| `LIGHT_ON` | Closes relay2 (GPIO 28 LOW) → light on |
+| `LIGHT_OFF` | Opens relay2 (GPIO 28 HIGH) → light off |
+| `LIGHT_TOGGLE` | Toggles relay2 state |
 
 ## Flash Workflow (how `flash` works internally)
 

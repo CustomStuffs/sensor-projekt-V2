@@ -2,12 +2,16 @@
 Machine Pico — UART bridge + relay controller
 Wiring: UART1 TX=GPIO4 → Project Pico RX=GPIO1
         UART1 RX=GPIO5 ← Project Pico TX=GPIO0
-        GPIO15 → Relay IN  (LOW = relay closed = RUN pulled to GND = reset)
+        GPIO15 → Relay1 IN  (LOW = relay closed = RUN pulled to GND = reset)
+        GPIO28 → Relay2 IN  (LOW = relay closed = light ON)
 
 Commands (normal mode):
-  RESET         — pulse relay 100 ms → hard-reset Project Pico
+  RESET         — pulse relay1 100 ms → hard-reset Project Pico
   SEND:<text>   — write <text>\\r\\n to Project Pico via UART
   BRIDGE        — enter transparent passthrough mode (USB ↔ UART1)
+  LIGHT_ON      — close light relay (GPIO28 LOW)
+  LIGHT_OFF     — open light relay (GPIO28 HIGH)
+  LIGHT_TOGGLE  — toggle light relay
 
 Bridge mode:
   All USB bytes are forwarded to UART1 and vice versa with no processing.
@@ -25,6 +29,7 @@ RESET_MS = 100
 
 uart  = machine.UART(1, baudrate=BAUD, tx=machine.Pin(4), rx=machine.Pin(5))
 relay = machine.Pin(15, machine.Pin.OUT, value=1)
+light = machine.Pin(28, machine.Pin.OUT, value=1)   # active-LOW; 1 = off
 
 _poll = uselect.poll()
 _poll.register(sys.stdin, uselect.POLLIN)
@@ -66,7 +71,10 @@ def run_bridge():
 
             # USB → UART: forward mpremote / tool input
             if _poll.poll(0):
-                ch = sys.stdin.read(1)
+                try:
+                    ch = sys.stdin.read(1)
+                except UnicodeError:
+                    continue
                 uart.write(ch.encode("latin-1"))
 
                 if ch == "\x03":          # Ctrl-C
@@ -84,7 +92,7 @@ def run_bridge():
 
 # ── Normal command mode ───────────────────────────────────────────────────────
 
-usb_write("[bridge] ready — RESET | SEND:<text> | BRIDGE\r\n")
+usb_write("[bridge] ready — RESET | SEND:<text> | BRIDGE | LIGHT_ON | LIGHT_OFF | LIGHT_TOGGLE\r\n")
 
 _cmd_buf = ""
 
@@ -97,7 +105,10 @@ while True:
 
     # Read USB commands (non-blocking)
     if _poll.poll(0):
-        ch = sys.stdin.read(1)
+        try:
+            ch = sys.stdin.read(1)
+        except UnicodeError:
+            continue
 
         if ch in ("\r", "\n"):
             cmd = _cmd_buf.strip()
@@ -117,6 +128,18 @@ while True:
 
             elif cmd == "BRIDGE":
                 run_bridge()
+
+            elif cmd == "LIGHT_ON":
+                light.value(0)
+                usb_write("[bridge] light ON\r\n")
+
+            elif cmd == "LIGHT_OFF":
+                light.value(1)
+                usb_write("[bridge] light OFF\r\n")
+
+            elif cmd == "LIGHT_TOGGLE":
+                light.value(1 - light.value())
+                usb_write("[bridge] light " + ("ON" if light.value() == 0 else "OFF") + "\r\n")
 
             else:
                 usb_write("[bridge] unknown: " + cmd + "\r\n")
