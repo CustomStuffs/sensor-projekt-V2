@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensor Hub — Project Explained</title>
+<style>
+  /* ── Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Georgia", serif;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* ── Typography ── */
+  h1 {
+    font-size: 22pt;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+    color: #111;
+  }
+  .subtitle {
+    font-size: 11pt;
+    color: #555;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-top: 32px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 4px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    font-weight: bold;
+    color: #333;
+    margin-top: 18px;
+    margin-bottom: 6px;
+  }
+  p { margin-bottom: 10px; }
+
+  /* ── Code ── */
+  code {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 9.5pt;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  pre {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 9pt;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-left: 4px solid #4a90d9;
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin: 10px 0 14px;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px;
+    font-size: 10pt;
+  }
+  th {
+    background: #2c5282;
+    color: #fff;
+    text-align: left;
+    padding: 7px 10px;
+    font-size: 9.5pt;
+  }
+  td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    background: #ebf4ff;
+    border-left: 4px solid #4a90d9;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 10.5pt;
+  }
+  .callout strong { color: #2c5282; }
+
+  /* ── Warning / honest note box ── */
+  .honest {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-left: 4px solid #e53e3e;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 10.5pt;
+  }
+  .honest strong { color: #c53030; }
+
+  /* ── Diagram box ── */
+  .diagram {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 9.5pt;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 12px 0 18px;
+    line-height: 1.6;
+  }
+
+  /* ── Header strip ── */
+  .header-strip {
+    background: #2c5282;
+    color: white;
+    padding: 18px 24px;
+    border-radius: 6px;
+    margin-bottom: 28px;
+  }
+  .header-strip h1 { color: white; margin-bottom: 4px; }
+  .header-strip .subtitle { color: #bee3f8; margin-bottom: 0; font-style: normal; }
+
+  /* ── Section number badge ── */
+  .section-num {
+    display: inline-block;
+    background: #2c5282;
+    color: white;
+    font-size: 9pt;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Key idea highlight ── */
+  .key-idea {
+    background: #fffbeb;
+    border: 1px solid #f6d860;
+    border-left: 4px solid #d97706;
+    border-radius: 4px;
+    padding: 8px 14px;
+    margin: 10px 0;
+    font-size: 10.5pt;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { padding: 0; font-size: 10.5pt; }
+    h2 { page-break-after: avoid; }
+    h3 { page-break-after: avoid; }
+    pre, table, .diagram { page-break-inside: avoid; }
+    .callout, .key-idea { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  @page {
+    margin: 20mm 18mm;
+    @bottom-center {
+      content: "Sensor Hub — Project Explained  |  Page " counter(page);
+      font-size: 9pt;
+      color: #888;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header-strip">
+  <h1>Sensor Hub — Project Explained</h1>
+  <div class="subtitle">A guide for developers new to embedded + full-stack projects</div>
+</div>
+
+<!-- ─────────────────────────── HONEST INTRO ─────────────────────────── -->
+<div class="honest">
+  <strong>A note before you read:</strong> This project was not designed by a professional
+  engineer. It was built by someone with an idea — and maybe some clients — who figured
+  things out along the way. Some of the rules and design choices in here might not be
+  textbook-perfect. That is completely fine. The number one priority of this codebase is
+  that <strong>it is always easy to add new features or sensors</strong>, even for someone
+  who did not write the original code. If something looks unconventional, that is probably
+  why — simplicity and extensibility were chosen over technical purity.
+</div>
+
+<!-- ─────────────────────────── WHAT DOES IT DO ─────────────────────────── -->
+<h2>What does this project do?</h2>
+<p>
+  It is an <strong>outdoor plant and environment monitor</strong>. A small microcontroller sits
+  outside, reads physical sensors (soil moisture, humidity, light, etc.), and automatically
+  controls a water pump. You can see all the live data in a web browser and send manual
+  commands from anywhere in the world.
+</p>
+
+<div class="diagram">
+[Physical world — soil, air, light]
+        |
+[Pico W microcontroller]  ──── WiFi ────►  [Raspberry Pi server]  ────►  [Your browser]
+  reads sensors                              stores all data               shows charts
+  controls relay                             serves the dashboard          sends commands
+</div>
+
+<!-- ─────────────────────────── THREE PIECES ─────────────────────────── -->
+<h2>The three pieces (plus hardware)</h2>
+
+<p>The project is split into four folders. Each one is independent — a rule in this project
+is that you <strong>never change one without updating the others</strong> when the shared
+API contract changes.</p>
+
+<table>
+  <tr>
+    <th>Folder</th>
+    <th>What it is</th>
+    <th>Language / Tool</th>
+  </tr>
+  <tr><td><code>firmware/</code></td><td>Code that runs on the Pico W microcontroller</td><td>MicroPython</td></tr>
+  <tr><td><code>server/</code></td><td>Web API + database on the Raspberry Pi</td><td>Python / FastAPI</td></tr>
+  <tr><td><code>dashboard/</code></td><td>Web page you open in a browser</td><td>HTML + JavaScript</td></tr>
+  <tr><td><code>hardware/</code></td><td>Circuit board design (PCB)</td><td>KiCad</td></tr>
+</table>
+
+<!-- ─────────────────────────── FIRMWARE ─────────────────────────── -->
+<h2><span class="section-num">1</span> Firmware — the tiny computer outside</h2>
+
+<p>
+  The <strong>Raspberry Pi Pico W</strong> is a chip the size of a thumb drive. It has no
+  screen or keyboard — it just runs a Python program on repeat. The language is
+  <strong>MicroPython</strong>, a lightweight version of Python 3 designed for
+  microcontrollers.
+</p>
+
+<h3>The main loop</h3>
+<p>
+  The entry point is <code>firmware/src/main.py</code>. Everything the device does fits
+  into this loop, which repeats every 60 seconds (development) or 30 minutes (battery mode):
+</p>
+<pre>while True:
+    reading = read_all_sensors(...)          # ask every sensor for a number
+    commands, new_cfg = run_upload_cycle(...) # WiFi on → send data → get orders
+    ack_id = handle_relay(commands, ...)     # turn pump on or off
+    power.sleep(interval_s, relay=relay)    # deep sleep to save battery</pre>
+
+<h3>Sensors — one file each</h3>
+<p>
+  Every sensor lives in its own file inside <code>firmware/src/sensors/</code>. Each file
+  has a single <code>read()</code> function that returns either a number (<code>float</code>)
+  or <code>None</code> if the sensor is not connected or fails. It must <em>never</em> crash
+  the program — a broken sensor should not stop the whole device.
+</p>
+<div class="key-idea">
+  <strong>Extensibility rule:</strong> Adding a new sensor = one new file in
+  <code>sensors/</code> + one new entry in <code>config.json</code>. Nothing else changes.
+</div>
+
+<h3>The config file</h3>
+<p>
+  <code>firmware/src/config.json</code> is the only file you hand-edit. It holds WiFi
+  credentials, which sensors are enabled, calibration numbers, and relay rules:
+</p>
+<pre>{
+  "wifi": { "ssid": "MyNetwork", "password": "secret" },
+  "poll_interval_s": 60,
+  "sensors": {
+    "humidity":    { "enabled": true },
+    "soil":        { "enabled": true, "adc_pin": 26 },
+    "water_level": { "enabled": true, "pin": 16 }
+  },
+  "relay_rules": [
+    { "sensor": "soil_pct", "op": "&lt;", "value": 30,
+      "action": "relay_on", "duration_s": 300 }
+  ]
+}</pre>
+<p>
+  The last rule reads: <em>"If soil moisture drops below 30%, run the pump for 5 minutes."</em>
+  No code change needed — just edit this file and reboot the device.
+</p>
+
+<h3>Ring buffer — offline storage</h3>
+<p>
+  If WiFi fails for several hours, readings are kept in a ring buffer stored in the Pico W's
+  flash memory (up to 48 readings). The next time WiFi succeeds, all buffered readings are
+  uploaded at once. Nothing is lost.
+</p>
+
+<h3>Power budget</h3>
+<table>
+  <tr><th>State</th><th>Current draw</th><th>Duration per 30-min cycle</th></tr>
+  <tr><td>Deep sleep</td><td>0.30 mA</td><td>~1745 s</td></tr>
+  <tr><td>Reading sensors</td><td>25 mA</td><td>~25 s</td></tr>
+  <tr><td>WiFi active</td><td>80 mA</td><td>~15 s</td></tr>
+  <tr><td><strong>Average</strong></td><td><strong>~1.2 mA</strong></td><td></td></tr>
+</table>
+<p>A 10,000 mAh power bank lasts roughly 6–11 months.</p>
+
+<!-- ─────────────────────────── SERVER ─────────────────────────── -->
+<h2><span class="section-num">2</span> Server — the brain on the Raspberry Pi</h2>
+
+<p>
+  The server is a <strong>web API</strong> — a Python program that listens on port 8080 and
+  answers HTTP requests. Both the Pico W and your browser talk to it. It is built with
+  <strong>FastAPI</strong>, which automatically generates documentation and validates all
+  incoming data.
+</p>
+
+<h3>File layout</h3>
+<pre>server/
+├── api/
+│   ├── main.py          ← starts the server, registers all routes
+│   ├── models.py        ← defines what valid JSON looks like (Pydantic)
+│   └── routes/
+│       ├── time_sync.py ← POST /api/time
+│       ├── readings.py  ← POST /api/readings, GET /api/readings
+│       ├── commands.py  ← relay command queue
+│       └── schedule.py  ← watering schedule
+├── storage/
+│   ├── database.py      ← SQLite connection + query helpers
+│   └── schema.sql       ← table definitions
+└── config/
+    └── settings.py      ← port number, file paths</pre>
+
+<h3>The database</h3>
+<p>
+  All data lives in a single <strong>SQLite</strong> file (<code>sensor_hub.db</code>).
+  SQLite is a database that is just one file on disk — no separate server process to manage.
+  Perfect for a Raspberry Pi.
+</p>
+<table>
+  <tr><th>Table</th><th>What it stores</th></tr>
+  <tr><td><code>devices</code></td><td>One row per Pico W, with when it was last seen</td></tr>
+  <tr><td><code>readings</code></td><td>Every sensor reading, forever — never deleted</td></tr>
+  <tr><td><code>commands</code></td><td>Relay commands queued by the dashboard</td></tr>
+  <tr><td><code>device_config</code></td><td>Watering schedule per device</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Idempotency trick:</strong> The <code>readings</code> table has
+  <code>UNIQUE(device_id, ts)</code>. If the Pico W retries the same upload because WiFi
+  dropped mid-request, the server silently ignores the duplicate. No double counting.
+</div>
+
+<h3>Security — no passwords needed</h3>
+<p>
+  There is no login system. Instead, the Raspberry Pi uses <strong>Tailscale</strong> — a
+  VPN that makes the server only reachable from your own devices, over an encrypted tunnel.
+  One command to set up, nothing to leak.
+</p>
+
+<!-- ─────────────────────────── DASHBOARD ─────────────────────────── -->
+<h2><span class="section-num">3</span> Dashboard — what you see in the browser</h2>
+
+<p>
+  The dashboard is plain <strong>HTML, CSS, and JavaScript</strong> — no React, no Vue, no
+  build step. The FastAPI server serves it as static files. When you open the URL in a
+  browser, you get the dashboard; it then makes <code>fetch()</code> calls back to the same
+  server to load data.
+</p>
+
+<table>
+  <tr><th>File</th><th>What it does</th></tr>
+  <tr><td><code>src/api.js</code></td><td>All the <code>fetch()</code> calls to the server</td></tr>
+  <tr><td><code>src/charts.js</code></td><td>Draws the sensor data graphs</td></tr>
+  <tr><td><code>src/relay.js</code></td><td>Manual pump on/off controls</td></tr>
+  <tr><td><code>styles/main.css</code></td><td>Styling</td></tr>
+  <tr><td><code>index.html</code></td><td>The page itself — loads all the above</td></tr>
+</table>
+
+<!-- ─────────────────────────── HARDWARE ─────────────────────────── -->
+<h2><span class="section-num">4</span> Hardware — the circuit board</h2>
+
+<p>
+  A custom PCB (circuit board) connects all the sensors and the relay to the Pico W's GPIO
+  pins. Designed in <strong>KiCad</strong> (free, open-source PCB design tool). Sensors
+  plug in via <strong>Wago lever connectors</strong> — no soldering required to swap a sensor.
+</p>
+
+<h3>Key GPIO pin assignments</h3>
+<table>
+  <tr><th>GPIO pin</th><th>What's connected</th></tr>
+  <tr><td>GP2 / GP3</td><td>I2C bus — light sensor, pH chip</td></tr>
+  <tr><td>GP8</td><td>DS18B20 digital temperature probe (1-Wire)</td></tr>
+  <tr><td>GP9</td><td>DHT22 humidity + temperature sensor</td></tr>
+  <tr><td>GP10</td><td>Relay — drives the water pump</td></tr>
+  <tr><td>GP11</td><td>PIR motion sensor (also wake-up interrupt)</td></tr>
+  <tr><td>GP26</td><td>Soil moisture sensor (analog voltage)</td></tr>
+</table>
+
+<!-- ─────────────────────────── END TO END ─────────────────────────── -->
+<h2>How one complete cycle works — end to end</h2>
+
+<pre>1.  Pico W wakes from deep sleep
+2.  Reads all enabled sensors → builds a dict: { ts, temp_c, soil_pct, ... }
+3.  Turns WiFi on
+4.  POST /api/time  →  server replies with current unix timestamp + any config changes
+5.  POST /api/readings  →  server saves the reading to SQLite
+6.  GET  /api/commands  →  server replies with any pending commands
+            (e.g. "relay_on for 300 s" because you clicked the button in the browser)
+7.  Pico executes the command → turns the pump on
+8.  WiFi off, back to deep sleep
+9.  Next wake-up: POST /api/commands/42/ack  →  tells server "done, command executed"
+
+Meanwhile in the browser:
+    setInterval(() => fetchReadings(), 30_000)  →  charts update every 30 seconds</pre>
+
+<!-- ─────────────────────────── API CONTRACT ─────────────────────────── -->
+<h2>The API contract — the shared language</h2>
+
+<p>
+  An <strong>API contract</strong> is an agreement about what JSON data is sent and received.
+  The Pico W, the server, and the dashboard all need to agree — like three people speaking
+  the same language. Here are the two most important endpoints:
+</p>
+
+<h3>POST /api/time — time sync and config delivery</h3>
+<pre>Request (Pico → server):
+  { "device_id": "pico_001", "uptime_ms": 123456 }
+
+Response (server → Pico):
+  { "unix_ts": 1748000000,
+    "config": { "interval_s": 1800, "relay_schedule": [] } }</pre>
+
+<h3>POST /api/readings — sensor data upload</h3>
+<pre>Request (Pico → server):
+  { "device_id": "pico_001", "fw": "1.0.0", "vbus_mv": 4850,
+    "readings": [{ "ts": 1748000000, "temp_c": 22.5,
+                   "humidity_pct": 65.2, "soil_pct": 45,
+                   "ph": null, "lux": null }] }
+
+Response: { "ok": true, "stored": 1 }</pre>
+
+<div class="callout">
+  All sensor fields can be <code>null</code>. If a sensor is not connected, it simply sends
+  <code>null</code> and the dashboard skips it. The pipeline handles missing sensors
+  gracefully at every layer.
+</div>
+
+<!-- ─────────────────────────── DESIGN DECISIONS ─────────────────────────── -->
+<h2>Key design decisions and why</h2>
+
+<p>
+  Not all of these decisions came from a textbook. Some were made because they felt right
+  for a solo builder with a small budget and real clients. The goal was always:
+  <em>keep it simple enough that you can come back to it in 6 months and still understand it.</em>
+</p>
+
+<table>
+  <tr><th>Decision</th><th>Why</th></tr>
+  <tr>
+    <td><strong>One file per sensor, one config entry to enable it</strong></td>
+    <td>The most important rule in the whole project. New sensors or features should never
+    require digging through unrelated code.</td>
+  </tr>
+  <tr>
+    <td>MicroPython, not C</td>
+    <td>Much faster to write and debug. The Pico W is fast enough for sensor polling.</td>
+  </tr>
+  <tr>
+    <td>SQLite, not PostgreSQL</td>
+    <td>Runs on a Pi with zero setup. Append-only sensor data fits SQLite perfectly.</td>
+  </tr>
+  <tr>
+    <td>Vanilla JS, no framework</td>
+    <td>The dashboard is simple enough that plain JS is less code, not more.</td>
+  </tr>
+  <tr>
+    <td>Tailscale instead of auth</td>
+    <td>One command to install. No passwords to manage or leak.</td>
+  </tr>
+  <tr>
+    <td>Ring buffer on the Pico</td>
+    <td>Offline resilience — readings survive multi-hour WiFi outages.</td>
+  </tr>
+  <tr>
+    <td><code>None</code> on sensor error, never raise</td>
+    <td>A broken sensor must not crash the whole device.</td>
+  </tr>
+  <tr>
+    <td><code>config.json</code> as the only tuneable file</td>
+    <td>Non-programmers can adjust intervals, thresholds, and schedules without touching code.</td>
+  </tr>
+</table>
+
+<!-- ─────────────────────────── WHERE TO START ─────────────────────────── -->
+<h2>Where to start if you want to change something</h2>
+
+<p>
+  The whole codebase was designed around one principle: <strong>a new developer (or the
+  original creator six months later) should be able to add something without having to
+  understand everything first.</strong> Here is how that works in practice:
+</p>
+
+<div class="callout">
+  <strong>Add a new sensor:</strong> Create <code>firmware/src/sensors/my_sensor.py</code>
+  with a <code>read()</code> function returning <code>float | None</code>. Add one entry to
+  <code>config.json</code>. Done — the rest of the pipeline picks it up automatically.
+  You do not need to touch the server or the dashboard just to start collecting the data.
+</div>
+
+<div class="callout">
+  <strong>Add a new API endpoint:</strong> Create a route file in
+  <code>server/api/routes/</code>, register it in <code>server/api/main.py</code>, then add
+  the matching <code>fetch()</code> call in <code>dashboard/src/api.js</code>. Update all
+  three <code>CLAUDE.md</code> files to reflect the new contract.
+</div>
+
+<div class="callout">
+  <strong>Change the relay rules:</strong> Edit <code>relay_rules</code> in
+  <code>firmware/src/config.json</code> and reboot the Pico. No code change needed.
+</div>
+
+<div class="honest">
+  <strong>If something feels wrong or too complicated:</strong> trust that instinct. This
+  project was not built all at once by a team of experts — it grew from an idea. If a rule
+  or pattern does not make sense to you, it might genuinely not be the best approach. The
+  goal is always a system that works and that real people can maintain, not one that looks
+  impressive on paper.
+</div>
+
+<!-- ─────────────────────────── FOOTER ─────────────────────────── -->
+<hr style="margin-top:40px; border:none; border-top:1px solid #ddd;">
+<p style="font-size:9pt; color:#888; text-align:center; margin-top:10px;">
+  Sensor Hub V2 &nbsp;|&nbsp; Outdoor environmental monitor &nbsp;|&nbsp;
+  MicroPython + FastAPI + SQLite
+</p>
+
+</body>
+</html>
