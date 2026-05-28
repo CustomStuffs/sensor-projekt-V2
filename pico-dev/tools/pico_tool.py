@@ -6,7 +6,7 @@ Commands
 --------
   monitor              Stream Project Pico debug output live (also accepts RESET / SEND:)
   reset                Hard-reset Project Pico via relay (100 ms)
-  flash <file.py>      Copy a file to Project Pico — requires explicit confirmation
+  flash <file.py>      Copy a file to Project Pico via its USB port — requires explicit confirmation
 
 Auto-detection
 --------------
@@ -75,7 +75,9 @@ def pick_machine_port(explicit: str | None = None) -> str:
 
 
 def _open(port: str) -> serial.Serial:
-    return serial.Serial(port, _BAUD, timeout=0.1)
+    s = serial.Serial(port, _BAUD, timeout=0.1, dsrdtr=False, rtscts=False)
+    s.dtr = False
+    return s
 
 
 # ── Commands ──────────────────────────────────────────────────────────────────
@@ -131,13 +133,13 @@ def cmd_reset(port: str) -> None:
 
 def cmd_flash(port: str, file_path: str) -> None:
     """
-    Flash a .py file to the Project Pico.
+    Flash a .py file to the Project Pico via its own USB port.
 
     Requires:
     - Project Pico ALSO connected via USB (for mpremote access)
     - mpremote installed: pip install mpremote
 
-    Flow: confirm → RESET via relay → 2 s pause → mpremote copy
+    Flow: confirm → RESET via relay → mpremote on Project Pico USB within boot.py 5 s window
     """
     fp = Path(file_path)
     if not fp.exists():
@@ -170,43 +172,34 @@ def cmd_flash(port: str, file_path: str) -> None:
         print("Aborted.")
         return
 
-    # ── Reset → flash within boot window ─────────────────────────────────────
-    # boot.py gives a 5 s REPL window after every hard reset. USB re-enumeration
-    # takes ~0.5 s, leaving ~4.5 s to run mpremote. We try three times with
-    # increasing delays so one of them hits the window regardless of USB timing.
+    # ── Reset → flash within boot.py 5 s window ──────────────────────────────
+    # boot.py holds the USB REPL open for 5 s after every hard reset.
+    # USB re-enumeration takes ~0.5-1 s, so we have ~4 s to hit the window.
+    # Three attempts at t≈1s, t≈2.5s, t≈4s cover the window regardless of timing.
+    # "resume" skips mpremote's own Ctrl-D so it doesn't trigger another boot cycle.
     print("[flash] Sending RESET to Project Pico...")
     with _open(port) as ser:
         ser.write(b"RESET\r\n")
 
-    # The Project Pico uses UART0 as its primary REPL (Pico W MicroPython default).
-    # mpremote on ACM1 (USB) can't reach it. Strategy:
-    #   1. Relay RESET → Project Pico reboots into boot.py 5 s window
-    #   2. Send BRIDGE to Machine Pico → transparent USB↔UART passthrough
-    #   3. mpremote on ACM0 (Machine Pico) → reaches Project Pico UART0 REPL
-    #   4. "resume" skips mpremote's Ctrl-D (no 5 s boot.py sleep triggered)
     dest = f":{fp.name}"
-    cmd  = ["mpremote", "connect", port, "resume", "cp", str(fp), dest]
+    cmd  = ["mpremote", "connect", project_port, "resume", "cp", str(fp), dest]
 
-    print("[flash] Activating BRIDGE mode on Machine Pico...")
-    with _open(port) as ser:
-        ser.write(b"BRIDGE\r\n")
-
-    print("[flash] waiting 2 s for Project Pico to boot...")
-    time.sleep(2)
-
-    for attempt, wait in enumerate([0, 1.0, 1.0], start=1):
-        if wait:
-            print(f"[flash] retry in {wait}s...")
-            time.sleep(wait)
+    for attempt, delay in enumerate([1.0, 1.5, 1.5], start=1):
+        print(f"[flash] waiting {delay:.0f}s then attempt {attempt}/3 (t={sum([1.0,1.5,1.5][:attempt]):.1f}s after reset)...")
+        time.sleep(delay)
         print(f"[flash] attempt {attempt}/3: {' '.join(cmd)}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+        except subprocess.TimeoutExpired:
+            print(f"[flash] attempt {attempt} timed out")
+            continue
         if result.returncode == 0:
-            print(f"[flash] OK — {fp.name} copied")
+            print(f"[flash] OK — {fp.name} copied to Project Pico")
             return
         err = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "no output"
         print(f"[flash] attempt {attempt} failed: {err}")
 
-    print("[flash] all attempts failed — Machine Pico may need reflashing (bridge mode stuck)")
+    print("[flash] all attempts failed — try running within 5 s of a manual replug")
     sys.exit(1)
 
 

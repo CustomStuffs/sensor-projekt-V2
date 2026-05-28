@@ -11,3 +11,6 @@ __pycache__/
 
 # mpremote / MicroPython artifacts
 readings.json
+
+# Claude Code local config
+.claude/commands/
