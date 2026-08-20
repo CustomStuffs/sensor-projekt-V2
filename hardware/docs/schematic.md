@@ -2,6 +2,8 @@
 
 Use this as the reference for KiCad entry. Every connection in `bom.csv` traces back here.
 
+**Design decision (Aug 2026):** Minimum two on-board relays (K1 + K2). The board must support at least two independent actuator channels (pump, valve, etc.) without external modules. Future variants can add more relays; this is the baseline.
+
 ---
 
 ## System Block Diagram
@@ -10,7 +12,7 @@ Use this as the reference for KiCad entry. Every connection in `bom.csv` traces 
 USB-C 5V (power bank)
 │
 ├─ VSYS ──────────────────────────────── Pico W VSYS
-│                                         Relay coil (+)
+│                                         K1 + K2 coil (+)
 │
 └─ Pico W 3V3(OUT)
      ├─ Digital 3V3 ─── VEML7700, DS18B20, DHT22, PIR, LMP91200, BC817 pullups
@@ -28,12 +30,12 @@ SPI Bus (GP4/GP5/GP6/GP7)
 
 GPIO direct:
   GP9  ── DHT22 data (Wago port 2, 10kΩ pullup)
-  GP10 ── Relay driver (→ BC817 base)
+  GP10 ── Relay 1 driver (→ Q1 BC817 base)
   GP11 ── PIR output (Wago port 3, 10kΩ pullup, wake IRQ)
   GP12 ── PIR MOSFET gate (power gate for PIR)
   GP13 ── EC excitation PWM A → RC filter → LMP91200
   GP14 ── EC excitation PWM B (complement) → RC filter → LMP91200
-  GP15 ── (spare — was BH1750 ADDR; not needed for VEML7700)
+  GP15 ── Relay 2 driver (→ Q3 BC817 base)   ← was spare; now used for second relay
   GP16 ── Wago port 4 signal (generic)
   GP17 ── Wago port 5 signal (generic)
 ```
@@ -46,10 +48,10 @@ GPIO direct:
 
 | Net | Source | Destinations |
 |-----|--------|-------------|
-| VSYS | USB-C VBUS | Pico W VSYS, K1 coil (+), AP2112K VIN |
-| 3V3_DIG | Pico W 3V3(OUT) | BH1750 VCC, DS18B20 VDD, DHT22 VDD, LMP91200 VDD, BC817 pull, I2C pullup tops |
+| VSYS | USB-C VBUS | Pico W VSYS, K1 coil (+), K2 coil (+), AP2112K VIN |
+| 3V3_DIG | Pico W 3V3(OUT) | VEML7700 VCC, DS18B20 VDD, DHT22 VDD, LMP91200 VDD, BC817 pull, I2C pullup tops |
 | 3V3_ANA | AP2112K VOUT | ADS1115 VDD+AVDD, AD8603 VS+, VREF_TOP (pH divider), NTC pullup top |
-| GND_DIG | Pico W GND | All digital IC GND, BC817 emitter, K1 coil (–) via BC817 collector |
+| GND_DIG | Pico W GND | All digital IC GND, Q1/Q3 emitters, K1/K2 coil (–) via collectors |
 | GND_ANA | ADS1115 AGND | AD8603 VS–, pH divider bottom, NTC low side |
 | VREF_MID | pH divider midpoint | BNC shield, AD8603 IN– via 100kΩ, C_vref 100nF to GND_ANA |
 
@@ -137,7 +139,11 @@ ADS1115 I2C address: 0x48 (ADDR pin → GND_DIG)
 
 ---
 
-## Relay Driver
+## Relay Drivers (two channels — minimum requirement)
+
+Both relays are SPDT PCB-mount (Songle SRD-05VDC-SL-C or equivalent), 5 V coil from VSYS, contacts rated for mains if needed. Creepage ≥ 4 mm between contact nets and any logic/coil net.
+
+### Relay 1 (K1) — GP10
 
 ```
 GP10 ── R8(1kΩ) ── Q1(BC817) BASE
@@ -151,18 +157,35 @@ K1 NO  ─── J7 Wago port 6 pin 2
 K1 NC  ─── J7 Wago port 6 pin 3
 ```
 
+### Relay 2 (K2) — GP15
+
+```
+GP15 ── R18(1kΩ) ── Q3(BC817) BASE
+Q3 EMITTER ──────── GND_DIG
+Q3 COLLECTOR ─┬──── K2 coil (–)
+              └──── D3(1N4148) cathode
+K2 coil (+) ──┴──── D3(1N4148) anode ──── VSYS
+
+K2 COM ─── J10 terminal pin 1   (new 3-pin terminal or second Wago-style connector)
+K2 NO  ─── J10 terminal pin 2
+K2 NC  ─── J10 terminal pin 3
+```
+
+**Note:** J10 can be a second Wago 2060-453 or a Phoenix PT 1.5/3-5-H screw terminal. Place both relay contact connectors on the right board edge so cables exit cleanly.
+
 ---
 
-## Wago Ports
+## Wago / Terminal Ports
 
-| Port | Pin 1 | Pin 2 | Pin 3 | Default sensor |
-|------|-------|-------|-------|---------------|
+| Port | Pin 1 | Pin 2 | Pin 3 | Default sensor / function |
+|------|-------|-------|-------|---------------------------|
 | J2 (Wago 1) | 3V3_DIG | GND_DIG | GP8 (1-Wire) | DS18B20 temperature |
 | J3 (Wago 2) | 3V3_DIG | GND_DIG | GP9 (DHT data) | DHT22 temp+humidity |
 | J4 (Wago 3) | 3V3_DIG | GND_DIG | GP11 (PIR out) | PIR motion |
 | J5 (Wago 4) | 3V3_DIG | GND_DIG | GP16 | Generic / soil moisture signal |
 | J6 (Wago 5) | 3V3_DIG | GND_DIG | GP17 | Generic |
-| J7 (Wago 6) | K1 COM | K1 NO | K1 NC | Relay SPDT contacts |
+| J7 (Wago 6) | K1 COM | K1 NO | K1 NC | Relay 1 SPDT contacts |
+| J10 | K2 COM | K2 NO | K2 NC | Relay 2 SPDT contacts |
 
 **PIR power gate**: Q2 (BSS84, SOT-23 P-channel MOSFET) controlled by GP12 switches the 3V3 supply to the PIR on Wago port 3. This avoids the 50–65 mA PIR standby current during sleep.
 - Source → 3V3_DIG, Drain → PIR VCC (Wago port 3 pin 1), Gate → GP12
@@ -181,4 +204,4 @@ K1 NC  ─── J7 Wago port 6 pin 3
 | AD8603 VS+ | 100 nF | Within 0.5 mm of pin |
 | LMP91200 VDD | 100 nF | |
 | VREF_MID | 100 nF to GND_ANA | Filters virtual mid-rail |
-| BC817 collector trace | — | No cap; just keep trace short |
+| BC817 collector traces | — | No cap; keep traces short |

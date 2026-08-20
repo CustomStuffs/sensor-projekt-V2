@@ -28,7 +28,9 @@ Remote access via Tailscale VPN — no port forwarding, no auth layer needed.
 
 All sensor fields are nullable — unconnected sensors send `null`.
 
-## Relay
+## Relays (two on-board channels)
+
+The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15) as a hard minimum. This allows two simultaneous actuator channels (e.g. pump + valve) without external modules. Future board variants can add more relays.
 
 - **Auto rules**: threshold-based (e.g. water when soil < 30 %) configured in `firmware/src/config.json`
 - **Schedule**: time-based rules, also in `config.json`

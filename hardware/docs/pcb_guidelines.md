@@ -2,6 +2,8 @@
 
 Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
+**Hard requirement:** Two on-board relays (K1 + K2). Layout must accommodate both with full creepage clearance.
+
 ---
 
 ## Zone Map
@@ -22,15 +24,15 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 │  │  [AD8603]       │  │                                           │  │
 │  │     │           │  │  [LMP91200]                              │  │
 │  │  [VREF divider] │  │                                           │  │
-│  │                 │  │  [AP2112K]   [K1 RELAY + Q1/D2]         │  │
+│  │                 │  │  [AP2112K]   [K1 + K2 RELAYS + drivers] │  │
 │  └────────┬────────┘  └───────────────────────────────────────────┘  │
 │  AGND─────┘ (single-point join at ADS1115 AGND)                      │
 │                                                                      │
-│  ╔══╦══╦══╦══╦══╦══╗                                                │
-│  ║W1║W2║W3║W4║W5║W6║  ← Wago connectors, bottom board edge          │
-│  ╚══╩══╩══╩══╩══╩══╝                                                │
+│  ╔══╦══╦══╦══╦══╦══╗  ╔══╗                                          │
+│  ║W1║W2║W3║W4║W5║W6║  ║J10║  ← Wago 1-6 + Relay2 contacts           │
+│  ╚══╩══╩══╩══╩══╩══╝  ╚══╝                                          │
 │                                                                      │
-│  [J8 EC 4-pin terminal]            [USB-C panel header]             │
+│  [J8 EC 4-pin terminal]            [USB-C / VSYS header]            │
 │  [HDR1 debug 1×4]                  [Spare ADC header]               │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -67,23 +69,25 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ---
 
-## Relay Zone Rules
+## Relay Zone Rules (two relays)
 
-12. **Relay (K1)**: right board edge. Orient so contacts face away from logic area.
+12. **Relays (K1 + K2)**: right board edge. Orient so contacts face away from logic area. Place both relays side-by-side or stacked with adequate clearance.
 
-13. **Creepage**: 4 mm minimum clearance between relay contact traces (RELAY_COM, RELAY_NO, RELAY_NC) and any logic or coil trace. This is a safety requirement for mains-rated relay contacts.
+13. **Creepage**: 4 mm minimum clearance between any relay contact traces (COM/NO/NC of K1 or K2) and any logic or coil trace. This is a safety requirement for mains-rated relay contacts.
 
-14. **Flyback diode (D2)**: place 1N4148 directly across K1 coil pads. Cathode toward VSYS.
+14. **Flyback diodes**: place D2 (1N4148) directly across K1 coil pads and D3 directly across K2 coil pads. Cathode toward VSYS.
 
-15. **Q1 (BC817)**: place adjacent to K1. Base resistor R8 (1 kΩ) within 3 mm of Q1 base pad.
+15. **Drivers**: Q1 (BC817) for K1 adjacent to K1; Q3 (BC817) for K2 adjacent to K2. Base resistors R8 and R18 (1 kΩ) within 3 mm of the respective base pads.
+
+16. **Contact connectors**: J7 (Wago 6) for K1 contacts, J10 for K2 contacts — both on the right edge so actuator cables exit cleanly.
 
 ---
 
 ## Power Entry
 
-16. USB-C panel header connector at right board edge. Route VSYS trace as a 0.8 mm wide polygon from connector to Pico W VSYS and K1 coil+. Add 10 µF + 100 nF directly at the header connector.
+17. USB-C / VSYS header at right board edge. Route VSYS trace as a 0.8 mm wide polygon from connector to Pico W VSYS and both relay coils. Add 10 µF + 100 nF directly at the header connector.
 
-17. AP2112K input/output both need 10 µF + 100 nF. Place caps within 2 mm of IC pads.
+18. AP2112K input/output both need 10 µF + 100 nF. Place caps within 2 mm of IC pads.
 
 ---
 
@@ -101,7 +105,8 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ## Silkscreen
 
-Label all Wago connectors: W1=DS18B20, W2=DHT22, W3=PIR, W4=GP16, W5=GP17, W6=RELAY.  
+Label all Wago connectors: W1=DS18B20, W2=DHT22, W3=PIR, W4=GP16, W5=GP17, W6=RELAY1.  
+Label J10: RELAY2.  
 Label BNC connector: PH (pH probe).  
 Label EC terminal: EC (W=White, Y=Yellow, R=NTC+, B=NTC–).  
 Mark board version and date on silkscreen.
@@ -114,6 +119,6 @@ Mark board version and date on silkscreen.
 - [ ] Minimum trace/space ≥ 0.15 mm / 0.15 mm
 - [ ] Minimum via drill ≥ 0.3 mm
 - [ ] BNC and USB-C footprints match physical connector dimensions
-- [ ] Relay contact pads have ≥ 4 mm clearance from logic traces
+- [ ] Both relay contact pads have ≥ 4 mm clearance from logic traces
 - [ ] 4× M3 mounting holes at board corners (3.2 mm drill, no copper pad)
 - [ ] Gerbers exported: F.Cu, B.Cu, F.Mask, B.Mask, F.SilkS, Edge.Cuts, Drill
