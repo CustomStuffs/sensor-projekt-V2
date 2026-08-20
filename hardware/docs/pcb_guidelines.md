@@ -2,7 +2,10 @@
 
 Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
-**Hard requirement:** Two on-board relays (K1 + K2). Layout must accommodate both with full creepage clearance.
+**Hard requirements:**
+- Two on-board relays (K1 + K2) with full creepage clearance
+- Guard ring on the pH high-Z node (NODE_A)
+- RC snubbers on both relay contact sets (COM–NO)
 
 ---
 
@@ -14,8 +17,8 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 │                                                                      │
 │  ┌─────────────────┐  ┌───────────────────────────────────────────┐  │
 │  │  ANALOG ZONE    │  │          DIGITAL ZONE                     │  │
-│  │  (keepout: no   │  │                                           │  │
-│  │  digital traces)│  │  ┌────────────────────────────────────┐   │  │
+│  │  (keepout +     │  │                                           │  │
+│  │   Guard Ring)   │  │  ┌────────────────────────────────────┐   │  │
 │  │                 │  │  │     RASPBERRY PI PICO W            │   │  │
 │  │  [BNC]──[10MΩ]  │  │  │     (castellated, center-right)   │   │  │
 │  │     │           │  │  └────────────────────────────────────┘   │  │
@@ -24,7 +27,8 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 │  │  [AD8603]       │  │                                           │  │
 │  │     │           │  │  [LMP91200]                              │  │
 │  │  [VREF divider] │  │                                           │  │
-│  │                 │  │  [AP2112K]   [K1 + K2 RELAYS + drivers] │  │
+│  │                 │  │  [AP2112K]   [K1 + K2 + drivers +        │  │
+│  │                 │  │               snubbers]                  │  │
 │  └────────┬────────┘  └───────────────────────────────────────────┘  │
 │  AGND─────┘ (single-point join at ADS1115 AGND)                      │
 │                                                                      │
@@ -39,11 +43,17 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ---
 
-## Analog Zone Rules
+## Analog Zone Rules + Guard Ring
 
 1. **Keepout**: copper pour prohibition on both layers under AD8603, R1 (10 MΩ), R2 (10 MΩ), and NODE_A trace. No digital signal routing allowed in this zone.
 
-2. **Guard trace on NODE_A**: route the trace from R1 to AD8603 IN+ with a surrounding copper ring on both layers. Connect the ring to AD8603 OUT (the unity-gain output). This eliminates PCB surface leakage in parallel with the 10 MΩ input resistor.
+2. **Guard Ring on NODE_A (mandatory)**:
+   - Surround the entire NODE_A net (trace from R1 to AD8603 IN+) with a continuous copper ring on **both** top and bottom layers.
+   - Connect the guard ring **only** to AD8603 OUT (unity-gain buffered output).
+   - Do **not** connect the guard to GND or any other net.
+   - Typical gap between NODE_A and guard: 0.2–0.5 mm.
+   - No other traces may cross the guarded area.
+   - Purpose: potential difference ≈ 0 → surface leakage current becomes negligible. Critical for accurate pH readings.
 
 3. **VREF filter**: place C1 (100 nF on VREF_MID) directly at the divider midpoint node, not at the op-amp pin.
 
@@ -69,25 +79,32 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ---
 
-## Relay Zone Rules (two relays)
+## Relay Zone Rules (two relays + EMC snubbers)
 
-12. **Relays (K1 + K2)**: right board edge. Orient so contacts face away from logic area. Place both relays side-by-side or stacked with adequate clearance.
+12. **Relays (K1 + K2)**: right board edge. Orient so contacts face away from logic area. Place both relays side-by-side with adequate clearance.
 
-13. **Creepage**: 4 mm minimum clearance between any relay contact traces (COM/NO/NC of K1 or K2) and any logic or coil trace. This is a safety requirement for mains-rated relay contacts.
+13. **Creepage**: 4 mm minimum clearance between any relay contact traces (COM/NO/NC of K1 or K2) and any logic or coil trace. Safety requirement for mains-rated contacts.
 
 14. **Flyback diodes**: place D2 (1N4148) directly across K1 coil pads and D3 directly across K2 coil pads. Cathode toward VSYS.
 
 15. **Drivers**: Q1 (BC817) for K1 adjacent to K1; Q3 (BC817) for K2 adjacent to K2. Base resistors R8 and R18 (1 kΩ) within 3 mm of the respective base pads.
 
-16. **Contact connectors**: J7 (Wago 6) for K1 contacts, J10 for K2 contacts — both on the right edge so actuator cables exit cleanly.
+16. **Contact EMC snubbers (mandatory)**:
+    - R19 (100 Ω) + C19 (100 nF) in series across K1 COM–NO
+    - R20 (100 Ω) + C20 (100 nF) in series across K2 COM–NO
+    - Place the snubber components as close as possible to the relay contact pins.
+    - If the contacts will switch 230 VAC, use an X2-rated film capacitor for C19/C20. For 12/24 V DC loads a standard 100 nF ceramic or film is acceptable.
+    - Purpose: suppress arcing and EMI when switching inductive loads (pumps, solenoids, valves).
+
+17. **Contact connectors**: J7 (Wago 6) for K1 contacts, J10 for K2 contacts — both on the right edge so actuator cables exit cleanly.
 
 ---
 
 ## Power Entry
 
-17. USB-C / VSYS header at right board edge. Route VSYS trace as a 0.8 mm wide polygon from connector to Pico W VSYS and both relay coils. Add 10 µF + 100 nF directly at the header connector.
+18. USB-C / VSYS header at right board edge. Route VSYS trace as a 0.8 mm wide polygon from connector to Pico W VSYS and both relay coils. Add 10 µF + 100 nF directly at the header connector.
 
-18. AP2112K input/output both need 10 µF + 100 nF. Place caps within 2 mm of IC pads.
+19. AP2112K input/output both need 10 µF + 100 nF. Place caps within 2 mm of IC pads.
 
 ---
 
@@ -120,5 +137,7 @@ Mark board version and date on silkscreen.
 - [ ] Minimum via drill ≥ 0.3 mm
 - [ ] BNC and USB-C footprints match physical connector dimensions
 - [ ] Both relay contact pads have ≥ 4 mm clearance from logic traces
+- [ ] Guard ring present and connected only to AD8603 OUT
+- [ ] Snubbers (R19/C19 and R20/C20) placed close to relay contacts
 - [ ] 4× M3 mounting holes at board corners (3.2 mm drill, no copper pad)
 - [ ] Gerbers exported: F.Cu, B.Cu, F.Mask, B.Mask, F.SilkS, Edge.Cuts, Drill
