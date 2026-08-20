@@ -6,6 +6,7 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 - Two on-board relays (K1 + K2) with full creepage clearance
 - Guard ring on the pH high-Z node (NODE_A)
 - RC snubbers on both relay contact sets (COM–NO)
+- Both relay contacts use Wago connectors on the bottom edge (W6 = RELAY1, W7 = RELAY2) — no separate screw terminals next to the relays
 
 ---
 
@@ -32,12 +33,11 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 │  └────────┬────────┘  └───────────────────────────────────────────┘  │
 │  AGND─────┘ (single-point join at ADS1115 AGND)                      │
 │                                                                      │
-│  ╔══╦══╦══╦══╦══╦══╗  ╔══╗                                          │
-│  ║W1║W2║W3║W4║W5║W6║  ║J10║  ← Wago 1-6 + Relay2 contacts           │
-│  ╚══╩══╩══╩══╩══╩══╝  ╚══╝                                          │
+│  ╔══╦══╦══╦══╦══╦══╦══╗  ╔══╗                                       │
+│  ║W1║W2║W3║W4║W5║W6║W7║  ║J8║  ← Wago 1-7 (sensors + RELAY1/2) + EC │
+│  ╚══╩══╩══╩══╩══╩══╩══╝  ╚══╝                                       │
 │                                                                      │
-│  [J8 EC 4-pin terminal]            [USB-C / VSYS header]            │
-│  [HDR1 debug 1×4]                  [Spare ADC header]               │
+│  [HDR1 debug 1×4]                  [USB-C / VSYS header]            │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -96,7 +96,10 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
     - If the contacts will switch 230 VAC, use an X2-rated film capacitor for C19/C20. For 12/24 V DC loads a standard 100 nF ceramic or film is acceptable.
     - Purpose: suppress arcing and EMI when switching inductive loads (pumps, solenoids, valves).
 
-17. **Contact connectors**: J7 (Wago 6) for K1 contacts, J10 for K2 contacts — both on the right edge so actuator cables exit cleanly.
+17. **Contact connectors**: Both relays use Wago 3-pin connectors on the **bottom edge only**:
+    - W6 = K1 (RELAY1) COM / NO / NC
+    - W7 = K2 (RELAY2) COM / NO / NC
+    - No additional screw terminals next to the relays themselves.
 
 ---
 
@@ -122,8 +125,8 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ## Silkscreen
 
-Label all Wago connectors: W1=DS18B20, W2=DHT22, W3=PIR, W4=GP16, W5=GP17, W6=RELAY1.  
-Label J10: RELAY2.  
+Label all Wago connectors:  
+W1=DS18B20, W2=DHT22, W3=PIR, W4=GP16, W5=GP17, W6=RELAY1, W7=RELAY2.  
 Label BNC connector: PH (pH probe).  
 Label EC terminal: EC (W=White, Y=Yellow, R=NTC+, B=NTC–).  
 Mark board version and date on silkscreen.
@@ -139,5 +142,6 @@ Mark board version and date on silkscreen.
 - [ ] Both relay contact pads have ≥ 4 mm clearance from logic traces
 - [ ] Guard ring present and connected only to AD8603 OUT
 - [ ] Snubbers (R19/C19 and R20/C20) placed close to relay contacts
+- [ ] Seven Wago footprints on bottom edge (W1–W7)
 - [ ] 4× M3 mounting holes at board corners (3.2 mm drill, no copper pad)
 - [ ] Gerbers exported: F.Cu, B.Cu, F.Mask, B.Mask, F.SilkS, Edge.Cuts, Drill

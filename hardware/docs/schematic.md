@@ -6,6 +6,8 @@ Use this as the reference for KiCad entry. Every connection in `bom.csv` traces 
 
 **Also required:** Guard ring on the pH high-Z node + RC snubbers on both relay contact sets for EMC.
 
+**Connector decision:** Both relay contact sets use Wago 3-pin connectors on the bottom edge (W6 = Relay 1, W7 = Relay 2) for a consistent user interface. No separate screw terminals next to the relays.
+
 ---
 
 ## System Block Diagram
@@ -165,9 +167,9 @@ Q1 COLLECTOR ─┬──── K1 coil (–)
               └──── D2(1N4148) cathode
 K1 coil (+) ──┴──── D2(1N4148) anode ──── VSYS
 
-K1 COM ─── J7 Wago port 6 pin 1
-K1 NO  ─── J7 Wago port 6 pin 2
-K1 NC  ─── J7 Wago port 6 pin 3
+K1 COM ─── W6 (Wago 6) pin 1
+K1 NO  ─── W6 (Wago 6) pin 2
+K1 NC  ─── W6 (Wago 6) pin 3
 
 # Contact EMC snubber (across the switched path)
 K1 COM ── R19(100Ω) ── C19(100nF) ── K1 NO
@@ -182,9 +184,9 @@ Q3 COLLECTOR ─┬──── K2 coil (–)
               └──── D3(1N4148) cathode
 K2 coil (+) ──┴──── D3(1N4148) anode ──── VSYS
 
-K2 COM ─── J10 terminal pin 1
-K2 NO  ─── J10 terminal pin 2
-K2 NC  ─── J10 terminal pin 3
+K2 COM ─── W7 (Wago 7) pin 1
+K2 NO  ─── W7 (Wago 7) pin 2
+K2 NC  ─── W7 (Wago 7) pin 3
 
 # Contact EMC snubber
 K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
@@ -195,21 +197,22 @@ K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
 - Use X2-rated film capacitor if the contacts will switch 230 VAC. For 12/24 V DC loads a standard 100 nF ceramic or film is fine.
 - Place the snubber components as close as possible to the relay contact pins.
 
-**Note on J10:** Can be a second Wago 2060-453 or a Phoenix PT 1.5/3-5-H screw terminal. Place both relay contact connectors on the right board edge so cables exit cleanly.
-
 ---
 
 ## Wago / Terminal Ports
 
 | Port | Pin 1 | Pin 2 | Pin 3 | Default sensor / function |
 |------|-------|-------|-------|---------------------------|
-| J2 (Wago 1) | 3V3_DIG | GND_DIG | GP8 (1-Wire) | DS18B20 temperature |
-| J3 (Wago 2) | 3V3_DIG | GND_DIG | GP9 (DHT data) | DHT22 temp+humidity |
-| J4 (Wago 3) | 3V3_DIG | GND_DIG | GP11 (PIR out) | PIR motion |
-| J5 (Wago 4) | 3V3_DIG | GND_DIG | GP16 | Generic / soil moisture signal |
-| J6 (Wago 5) | 3V3_DIG | GND_DIG | GP17 | Generic |
-| J7 (Wago 6) | K1 COM | K1 NO | K1 NC | Relay 1 SPDT contacts |
-| J10 | K2 COM | K2 NO | K2 NC | Relay 2 SPDT contacts |
+| W1 (J2) | 3V3_DIG | GND_DIG | GP8 (1-Wire) | DS18B20 temperature |
+| W2 (J3) | 3V3_DIG | GND_DIG | GP9 (DHT data) | DHT22 temp+humidity |
+| W3 (J4) | 3V3_DIG | GND_DIG | GP11 (PIR out) | PIR motion |
+| W4 (J5) | 3V3_DIG | GND_DIG | GP16 | Generic / soil moisture signal |
+| W5 (J6) | 3V3_DIG | GND_DIG | GP17 | Generic |
+| W6 (J7) | K1 COM | K1 NO | K1 NC | Relay 1 SPDT contacts |
+| W7      | K2 COM | K2 NO | K2 NC | Relay 2 SPDT contacts |
+| J8      | WE | RE | NTC+ | NTC– | EC 4-wire sensor |
+
+All actuator and sensor connections use the same Wago style on the bottom edge for a consistent interface.
 
 **PIR power gate**: Q2 (BSS84, SOT-23 P-channel MOSFET) controlled by GP12 switches the 3V3 supply to the PIR on Wago port 3. This avoids the 50–65 mA PIR standby current during sleep.
 - Source → 3V3_DIG, Drain → PIR VCC (Wago port 3 pin 1), Gate → GP12

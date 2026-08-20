@@ -12,9 +12,8 @@ Q3,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,
 K1,SPDT relay 5V coil PCB mount,SRD-05VDC-SL-C,Songle,1,0.50,0.50,Reichelt / AliExpress,5V coil from VSYS; contacts rated 10A 250VAC
 K2,SPDT relay 5V coil PCB mount,SRD-05VDC-SL-C,Songle,1,0.50,0.50,Reichelt / AliExpress,Second on-board relay (minimum requirement)
 J1,BNC female right-angle PCB mount,5-1634500-1,TE Connectivity,1,0.80,0.80,Mouser 571-51634500-1,pH sensor connector
-J2-J7,Wago 3-pin push-in 5mm pitch,2060-453/998-404,Wago,6,0.60,3.60,Distrelec / Wago direct,Wago ports 1-6 (VCC GND Signal / Relay1 contacts)
+J2-J7 + W7,Wago 3-pin push-in 5mm pitch,2060-453/998-404,Wago,7,0.60,4.20,Distrelec / Wago direct,Wago ports W1-W7 (sensors + Relay1 + Relay2)
 J8,4-pin terminal block 3.5mm pitch,PT 1.5/4-3.5-H,Phoenix Contact,1,0.40,0.40,Mouser 651-1984617,EC sensor 4-wire connection
-J10,3-pin terminal block 5mm pitch (or Wago),PT 1.5/3-5-H or 2060-453,Phoenix / Wago,1,0.50,0.50,Mouser / Distrelec,Relay 2 SPDT contacts (COM/NO/NC)
 R1-R2,Resistor 10M 0603 1%,RC0603FR-0710ML,Yageo,2,0.05,0.10,Mouser 603-RC0603FR-0710ML,pH input protection
 R3-R4,Resistor 100k 0603 1%,RC0603FR-07100KL,Yageo,4,0.02,0.08,Mouser 603-RC0603FR-07100KL,VREF divider + AD8603 summing node
 R5-R9,Resistor 10k 0603 1%,RC0603FR-0710KL,Yageo,7,0.02,0.14,Mouser 603-RC0603FR-0710KL,I2C pullups / NTC pullup / SPI idle
@@ -34,4 +33,4 @@ Q2,P-channel MOSFET SOT-23,BSS84PXUMA1,Infineon,1,0.10,0.10,Mouser 771-BSS84PXUM
 R17,Resistor 10k 0603 1%,RC0603FR-0710KL,Yageo,1,0.02,0.02,Mouser 603-RC0603FR-0710KL,BSS84 gate pull-up to 3V3_DIG — keeps PIR off while Pico boots
 J9,2-pin screw terminal 5mm pitch,PT 1.5/2-5-H,Phoenix Contact,1,0.30,0.30,Mouser (verify SKU),VSYS + GND PCB-side input; connects to Bulgin PX0441 panel connector via short cable
 ,,,,,,,,
-,,TOTAL,,,,20.25,,Excluding enclosure and cable glands; DNP items at 0.00; two relays + snubbers included
+,,TOTAL,,,,20.85,,Excluding enclosure and cable glands; DNP items at 0.00; two relays + 7× Wago + snubbers
