@@ -4,6 +4,8 @@ Use this as the reference for KiCad entry. Every connection in `bom.csv` traces 
 
 **Design decision (Aug 2026):** Minimum two on-board relays (K1 + K2). The board must support at least two independent actuator channels (pump, valve, etc.) without external modules. Future variants can add more relays; this is the baseline.
 
+**Also required:** Guard ring on the pH high-Z node + RC snubbers on both relay contact sets for EMC.
+
 ---
 
 ## System Block Diagram
@@ -35,7 +37,7 @@ GPIO direct:
   GP12 ── PIR MOSFET gate (power gate for PIR)
   GP13 ── EC excitation PWM A → RC filter → LMP91200
   GP14 ── EC excitation PWM B (complement) → RC filter → LMP91200
-  GP15 ── Relay 2 driver (→ Q3 BC817 base)   ← was spare; now used for second relay
+  GP15 ── Relay 2 driver (→ Q3 BC817 base)
   GP16 ── Wago port 4 signal (generic)
   GP17 ── Wago port 5 signal (generic)
 ```
@@ -59,7 +61,7 @@ Single-point AGND/DGND join at ADS1115 AGND pin. Optional: 0Ω link or ferrite b
 
 ---
 
-## pH Analog Frontend
+## pH Analog Frontend + Guard Ring
 
 ```
 BNC_CENTER ──── R1(10MΩ) ──── NODE_A ──── AD8603 IN+
@@ -87,7 +89,18 @@ AD8603 VS–  ──── GND_ANA
 **Transfer function**: pH electrode output ±414 mV (pH 0–14 at 25°C) is offset by VREF = 1.65V.
 ADS1115 AIN0 sees 1.236V (pH 0) to 2.064V (pH 14). Use ±2.048V PGA setting.
 
-**Guard trace**: surround NODE_A trace with a guard ring connected to AD8603 OUT on the PCB.
+### Guard-Ring Implementation (mandatory)
+
+NODE_A (the net between R1 and AD8603 IN+) is a high-impedance node. Any surface leakage on the PCB corrupts the pH reading.
+
+**Layout rule:**
+- Surround the entire NODE_A trace with a continuous copper guard ring on **both** top and bottom layers.
+- Connect the guard ring **only** to AD8603 OUT (the unity-gain buffered output).
+- Do **not** connect the guard to GND or to any other net.
+- Keep the guard ring as close as practical to the NODE_A trace (typically 0.2–0.5 mm gap).
+- No other traces may cross the guarded area without a keep-out.
+
+This makes the potential difference between NODE_A and the surrounding copper almost zero → leakage current becomes negligible.
 
 ---
 
@@ -139,7 +152,7 @@ ADS1115 I2C address: 0x48 (ADDR pin → GND_DIG)
 
 ---
 
-## Relay Drivers (two channels — minimum requirement)
+## Relay Drivers + Contact EMC Snubbers (two channels)
 
 Both relays are SPDT PCB-mount (Songle SRD-05VDC-SL-C or equivalent), 5 V coil from VSYS, contacts rated for mains if needed. Creepage ≥ 4 mm between contact nets and any logic/coil net.
 
@@ -155,6 +168,9 @@ K1 coil (+) ──┴──── D2(1N4148) anode ──── VSYS
 K1 COM ─── J7 Wago port 6 pin 1
 K1 NO  ─── J7 Wago port 6 pin 2
 K1 NC  ─── J7 Wago port 6 pin 3
+
+# Contact EMC snubber (across the switched path)
+K1 COM ── R19(100Ω) ── C19(100nF) ── K1 NO
 ```
 
 ### Relay 2 (K2) — GP15
@@ -166,12 +182,20 @@ Q3 COLLECTOR ─┬──── K2 coil (–)
               └──── D3(1N4148) cathode
 K2 coil (+) ──┴──── D3(1N4148) anode ──── VSYS
 
-K2 COM ─── J10 terminal pin 1   (new 3-pin terminal or second Wago-style connector)
+K2 COM ─── J10 terminal pin 1
 K2 NO  ─── J10 terminal pin 2
 K2 NC  ─── J10 terminal pin 3
+
+# Contact EMC snubber
+K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
 ```
 
-**Note:** J10 can be a second Wago 2060-453 or a Phoenix PT 1.5/3-5-H screw terminal. Place both relay contact connectors on the right board edge so cables exit cleanly.
+**Snubber notes:**
+- Series RC across COM–NO suppresses arcing and EMI when switching inductive loads (pumps, solenoids, valves).
+- Use X2-rated film capacitor if the contacts will switch 230 VAC. For 12/24 V DC loads a standard 100 nF ceramic or film is fine.
+- Place the snubber components as close as possible to the relay contact pins.
+
+**Note on J10:** Can be a second Wago 2060-453 or a Phoenix PT 1.5/3-5-H screw terminal. Place both relay contact connectors on the right board edge so cables exit cleanly.
 
 ---
 
@@ -205,3 +229,4 @@ K2 NC  ─── J10 terminal pin 3
 | LMP91200 VDD | 100 nF | |
 | VREF_MID | 100 nF to GND_ANA | Filters virtual mid-rail |
 | BC817 collector traces | — | No cap; keep traces short |
+| Relay contact snubbers | 100 nF (C19/C20) | Across COM–NO of each relay |
