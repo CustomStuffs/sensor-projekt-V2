@@ -218,7 +218,7 @@ K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
 | W7 (J10) | K2 COM | K2 NO | K2 NC | Relay 2 SPDT contacts — **MAINS, 230 VAC / 5 A** |
 | J8      | WE | RE | NTC+ | NTC– | EC 4-wire sensor |
 
-All actuator and sensor connections use push-in Wago terminals for a consistent interface. W1–W5 are SELV sensor ports (Wago 2060-453); W6/W7 are mains-rated 3-pole THT terminals (Wago 2604-1103 or equivalent) in the separate MAINS zone.
+All actuator and sensor connections use push-in Wago terminals for a consistent interface. W1–W5 are SELV sensor ports (Wago 2601-1103, 3.5 mm); W6/W7 are mains-rated 3-pole THT terminals (Wago 236-403, 5 mm, 2.5 mm²) in the separate MAINS zone.
 
 **PIR power gate**: Q2 (BSS84, SOT-23 P-channel MOSFET) controlled by GP12 switches the 3V3 supply to the PIR on Wago port 3. This avoids the 50–65 mA PIR standby current during sleep.
 - Source → 3V3_DIG, Drain → PIR VCC (Wago port 3 pin 1), Gate → GP12

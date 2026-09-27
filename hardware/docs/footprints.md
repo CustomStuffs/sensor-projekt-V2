@@ -2,6 +2,7 @@
 
 Map every BOM line to its KiCad library footprint before starting schematic entry.
 Checked against the KiCad **10.0** standard libraries (Sep 2026).
+Remaining TBD: U6 (VEML7700) only.
 Flags: ⚠ = verify against datasheet before placing; ✗ = DNP v1; **TBD** = not in the KiCad library, project footprint still to be drawn.
 
 Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbols). A project footprint library `kicad/sensor_hub.pretty` will be added for the TBD footprints.
@@ -55,7 +56,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 | C3–C5 ✗ | 100 nF DNP | 0603 | same — place footprint, do not populate |
 | C13–C16 | 10 µF | 0805 | `Capacitor_SMD:C_0805_2012Metric` |
 | C17–C18 | 1 µF | 0603 | `Capacitor_SMD:C_0603_1608Metric` |
-| C19–C20 | 100 nF X2 film | THT box | `Capacitor_THT:C_Rect_*` matching the chosen X2 part's pitch — **TBD** until part chosen |
+| C19–C20 | 100 nF X2 film | THT box 13×6 mm, 10 mm pitch | `Capacitor_THT:C_Rect_L13.0mm_W6.0mm_P10.00mm_FKS3_FKP3_MKS4` ⚠ verify body size of chosen part |
 
 ---
 
@@ -63,9 +64,9 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 | Ref | Part | Type | KiCad footprint |
 |-----|------|------|-----------------|
-| J1 | TE 5-1634500-1 | RA BNC | **TBD** — not in KiCad 10. Library alternatives: `Connector_Coaxial:BNC_Amphenol_031-6575_Horizontal`, `BNC_TEConnectivity_1478035_Horizontal` (symbol `Connector:Conn_Coaxial`) |
-| J2–J6 | Wago 2060-453 | 3-pin (SELV sensors W1–W5) | **TBD** — not in KiCad 10 |
-| J7, J10 | Wago 2604-1103 | THT 3-pole 5 mm, mains (W6/W7) | **TBD** — not in KiCad 10. Library alternative: `TerminalBlock_WAGO:TerminalBlock_WAGO_236-403_1x03_P5.00mm_45Degree` if the 236 series ratings fit ⚠ |
+| J1 | Amphenol 031-6575 | RA BNC | `Connector_Coaxial:BNC_Amphenol_031-6575_Horizontal` (symbol `Connector:Conn_Coaxial`) |
+| J2–J6 | Wago 2601-1103 | THT 3-pole 3.5 mm (SELV sensors W1–W5) | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1103_1x03_P3.50mm_Horizontal` |
+| J7, J10 | Wago 236-403 | THT 3-pole 5 mm, mains (W6/W7), 24 A IEC / 300 V UL | `TerminalBlock_WAGO:TerminalBlock_WAGO_236-403_1x03_P5.00mm_45Degree` |
 | J8 | Phoenix PT 1.5/4-3.5-H | THT 4-pin 3.5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal` |
 | J9 | Phoenix PT 1.5/2-5-H | THT 2-pin 5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal` |
 | HDR1 | PEC04SAAN | 2.54 mm 1×4 | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` |

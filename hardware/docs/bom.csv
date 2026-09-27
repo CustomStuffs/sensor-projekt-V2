@@ -11,9 +11,9 @@ Q1,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,
 Q3,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 2 driver
 K1,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,5V coil ≈80 mA from VSYS; 16 A 250 VAC; 5 kVAC reinforced coil-contact (required for 230 VAC next to SELV); price est.
 K2,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,Second on-board relay (minimum requirement); same part as K1
-J1,BNC female right-angle PCB mount,5-1634500-1,TE Connectivity,1,0.80,0.80,Mouser 571-51634500-1,pH sensor connector
-J2-J6,Wago 3-pin push-in 5mm pitch (SELV sensors),2060-453/998-404,Wago,5,0.60,3.00,Distrelec / Wago direct,Sensor ports W1-W5 (SELV side only)
-J7 J10,Wago 3-pole THT push-in PCB terminal 5mm pitch mains-rated,2604-1103,Wago,2,1.50,3.00,Distrelec / Wago direct,Relay ports W6 = J7 (K1) + W7 = J10 (K2) in MAINS zone; 1.5-2.5 mm² wire; verify ≥250 VAC ≥10 A rating + footprint; price est.
+J1,BNC female right-angle PCB mount,031-6575,Amphenol RF,1,2.50,2.50,Mouser 523-31-6575,pH sensor connector; KiCad footprint BNC_Amphenol_031-6575_Horizontal; price est.
+J2-J6,Wago 3-pole push-in PCB terminal 3.5mm pitch (SELV sensors),2601-1103,Wago,5,0.90,4.50,Distrelec / Wago direct,Sensor ports W1-W5 (SELV side only); price est.
+J7 J10,Wago 3-pole CAGE CLAMP PCB terminal 5mm pitch 45°,236-403,Wago,2,1.20,2.40,Distrelec / Wago direct,Relay ports W6 = J7 (K1) + W7 = J10 (K2) in MAINS zone; 2.5 mm²; 24 A (IEC) / 300 V 15 A (UL); price est.
 J8,4-pin terminal block 3.5mm pitch,PT 1.5/4-3.5-H,Phoenix Contact,1,0.40,0.40,Mouser 651-1984617,EC sensor 4-wire connection
 R1,Resistor 10M 0603 1%,RC0603FR-0710ML,Yageo,1,0.05,0.05,Mouser 603-RC0603FR-0710ML,pH series input (BNC center → NODE_A); inside guard ring
 R2-R3,Resistor 100k 0603 1%,RC0603FR-07100KL,Yageo,2,0.02,0.04,Mouser 603-RC0603FR-07100KL,VREF divider (NODE_VREF); R4 intentionally unused
@@ -26,11 +26,11 @@ C1-C2 C6-C12,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,9,0.05,0.45,Mouser
 C3-C5,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,3,0.05,0.00,Mouser 81-GRM188R71E104KA1D,**DNP v1** — C3+C4 EC RC filter; C5 LMP91200 VDD decoupling
 C13-C16,Cap 10uF 0805 X5R 10V,GRM21BR61A106KE18L,Murata,4,0.10,0.40,Mouser 81-GRM21BR61A106KE8L,10 µF bulk: C13 VSYS entry; C14 LDO in; C15 LDO out; C16 ADS1115 VDD
 C17-C18,Cap 1uF 0603 X5R 10V,GRM188R61A105KA61D,Murata,2,0.08,0.16,Mouser 81-GRM188R61A105KA61D,AP2112K input (C17) / output (C18)
-C19-C20,Cap 100nF X2 film 275VAC THT,X2 MKP 100nF 275VAC (e.g. Vishay MKP338 2 X2 / KEMET R46),Vishay / KEMET,2,0.40,0.80,Mouser,Relay contact EMC snubbers (series with R19/R20); X2 mandatory (230 VAC); DNP per channel for LED/contactor loads; pick exact part + pitch before footprint
+C19-C20,Cap 100nF X2 film 275VAC THT,"X2 film 100nF 275VAC, 13x6 mm body, 10 mm pitch (e.g. WIMA MKX2)",Vishay / KEMET,2,0.40,0.80,Mouser,Relay contact EMC snubbers (series with R19/R20); X2 mandatory (230 VAC); DNP per channel for LED/contactor loads; footprint C_Rect_L13.0mm_W6.0mm_P10.00mm — verify body size of chosen part
 PCB,2-layer FR4 ENIG 100x80mm (qty 10),Custom,JLCPCB,1,1.50,1.50,jlcpcb.com,2-layer 1.6mm; order 10 minimum
 HDR1,2.54mm 1x4 debug header,PEC04SAAN,Sullins,1,0.20,0.20,Mouser 538-22-28-4040,UART0 TX RX + GND + 3V3
 U6,Ambient light sensor I2C 4-pin 6.8x2.35mm,VEML7700-TT,Vishay,1,0.80,0.80,Mouser 782-VEML7700-TT,I2C addr 0x10 (fixed). VERIFY package: VEML7700-TT is believed to be 4-pin 6.8x2.35 mm (2x2 mm ODFN is VEML6030)
 Q2,P-channel MOSFET SOT-23,BSS84PXUMA1,Infineon,1,0.10,0.10,Mouser 771-BSS84PXUMA1,PIR power gate (GP12); Vgs(th) -0.8 to -2.5V; Id -130mA; source→3V3_DIG drain→PIR VCC
 J9,2-pin screw terminal 5mm pitch,PT 1.5/2-5-H,Phoenix Contact,1,0.30,0.30,Mouser (verify SKU),VSYS + GND PCB-side input; connects to Bulgin PX0441 panel connector via short cable
 ,,,,,,,,
-,,TOTAL,,,,26.28,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers
+,,TOTAL,,,,28.88,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers

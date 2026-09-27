@@ -115,7 +115,7 @@ The insulation between MAINS and SELV must be **reinforced** because the SELV si
     - Purpose: suppress arcing and EMI when switching inductive loads (pumps, solenoids, valves).
     - Note: at 230 V / 50 Hz a 100 nF snubber passes ≈ 7 mA with the contact **open**. This can make LED lamps glow or small contactor coils hum, and the NO terminal is never truly dead while COM is live. For such loads, leave R19/C19 (or R20/C20) unpopulated. Always isolate the supply before working on the load.
 
-20. **Contact connectors**: W6 (K1) and W7 (K2) are 3-pole, mains-rated, THT push-in PCB terminals for 1.5–2.5 mm² wire (Wago 2604-1103 or equivalent, rated ≥ 250 VAC and ≥ 10 A). Place them at the **bottom-right corner inside the MAINS zone**, ≥ 8 mm from W5/J8 and any other SELV connector. Pin order: 1 = COM, 2 = NO, 3 = NC.
+20. **Contact connectors**: W6 (K1) and W7 (K2) are 3-pole, mains-rated, THT PCB terminals for up to 2.5 mm² wire (Wago 236-403, 24 A IEC / 300 V 15 A UL). Place them at the **bottom-right corner inside the MAINS zone**, ≥ 8 mm from W5/J8 and any other SELV connector. Pin order: 1 = COM, 2 = NO, 3 = NC.
 
 21. **External protection**: each relay channel must be protected upstream by a fuse or MCB rated ≤ 6 A (installation side, done by the electrician). The board traces are sized for 5 A continuous.
 
