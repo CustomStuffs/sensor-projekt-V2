@@ -63,7 +63,9 @@ GPIO direct:
 | GND_ANA | ADS1115 AGND | AD8603 VS–, pH divider bottom, NTC low side |
 | VREF_MID | pH divider midpoint | BNC shield, AD8603 IN– via 100kΩ, C_vref 100nF to GND_ANA |
 
-Single-point AGND/DGND join at ADS1115 AGND pin. Optional: 0Ω link or ferrite bead.
+Single-point AGND/DGND join at the ADS1115 GND pin, implemented as net tie **NT1** (GND_ANA ↔ GND). Optional: replace with 0Ω link or ferrite bead.
+The AP2112K (U5) GND and its input caps C14/C17/C8 sit on GND_ANA; the VSYS entry caps C13/C11 sit on GND.
+Pico W AGND (pin 33) is tied to GND (Pico ADC unused). KiCad ERC flags this as "power output to power output" — expected, can be excluded.
 
 ---
 
@@ -73,9 +75,9 @@ Single-point AGND/DGND join at ADS1115 AGND pin. Optional: 0Ω link or ferrite b
 BNC_CENTER ──── R1(10MΩ) ──── NODE_A ──── AD8603 IN+
                                 │
                              BAV99 (SOT-23)
-                                │ Pin2 = NODE_A
-                                │ Pin1 → GND_ANA
-                                │ Pin3 → 3V3_ANA
+                                │ Pin3 (common) = NODE_A
+                                │ Pin1 (anode)  → GND_ANA
+                                │ Pin2 (cathode) → 3V3_ANA
 
 3V3_ANA ── R2(100kΩ) ── NODE_VREF ── R3(100kΩ) ── GND_ANA
                               │
@@ -268,7 +270,8 @@ Single source for every reference. KiCad schematic, `bom.csv` and `footprints.md
 | K1, K2 | G2RL-1-E DC5 | Relays 1 and 2 |
 | Q1, Q3 | BC817-40 | Relay 1 / Relay 2 coil drivers |
 | Q2 | BSS84 | PIR power gate |
-| D1 | BAV99 | pH input clamp |
+| D1 | BAV99 | pH input clamp (pin 3 common → NODE_A) |
+| NT1 | Net tie | Single-point join GND_ANA ↔ GND at ADS1115 |
 | D2, D3 | 1N4148W | Relay 1 / Relay 2 flyback |
 | R1 | 10 MΩ | pH series input (BNC center → NODE_A) |
 | R2, R3 | 100 kΩ | VREF divider top / bottom |
