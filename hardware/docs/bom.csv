@@ -2,7 +2,7 @@ ref,description,part_number,manufacturer,qty,unit_chf,ext_chf,distributor,notes
 U1,Raspberry Pi Pico W,SC0918,Raspberry Pi,1,5.50,5.50,Distrelec / Mouser,Pico W with WiFi; castellated pads
 U2,16-bit I2C ADC 4ch VSSOP-10,ADS1115IDGSR,Texas Instruments,1,1.50,1.50,Mouser 595-ADS1115IDGSR,I2C addr 0x48 (ADDR to GND)
 U3,EC analog frontend SPI SOIC-14,LMP91200SD/NOPB,Texas Instruments,1,3.50,0.00,Mouser 926-LMP91200SDNOPB,**DNP v1** — EOL/unavailable (May 2026); footprint retained for v2 AD5933 redesign
-U4,Op-amp FET-in rail-to-rail SC70-5,AD8603ARTZ-R2,Analog Devices,1,1.20,1.20,Mouser 584-AD8603ARTZ-R2,pH unity-gain buffer; single supply 3.3V
+U4,Op-amp FET-in rail-to-rail TSOT-23-5,AD8603ARTZ-R2,Analog Devices,1,1.20,1.20,Mouser 584-AD8603ARTZ-R2,pH unity-gain buffer; single supply 3.3V
 U5,LDO 3.3V 600mA SOT-23-5,AP2112K-3.3TRG1,Diodes Inc.,1,0.40,0.40,Mouser 621-AP2112K-3.3TRG1,Separate analog 3V3 rail
 D1,Dual series ESD diode SOT-23,BAV99,Nexperia,1,0.10,0.10,Mouser 771-BAV99215,pH input protection (GND / VCC clamp)
 D2,Signal diode SOD-123,1N4148W,Vishay,1,0.05,0.05,Mouser 78-1N4148W-E3-08,Relay 1 flyback

@@ -15,7 +15,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 | U1 | Pico W SC0918 | Castellated | `MCU_Module:RaspberryPi_Pico_W` | `Module:RaspberryPi_Pico_W_SMD` |
 | U2 | ADS1115IDGSR | VSSOP-10 | `Analog_ADC:ADS1115IDGS` | `Package_SO:MSOP-10_3x3mm_P0.5mm` |
 | U3 ✗ | LMP91200SD/NOPB | ⚠ open | ⚠ none in KiCad 10 | `Package_SO:SOIC-14_3.9x8.7mm_P1.27mm` ⚠ |
-| U4 | AD8603ARTZ-R2 | SC70-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:SOT-23-5` ⚠ |
+| U4 | AD8603ARTZ-R2 | TSOT-23-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:TSOT-23-5` (KiCad symbol default) ⚠ |
 | U5 | AP2112K-3.3TRG1 | SOT-23-5 | `Regulator_Linear:AP2112K-3.3` | `Package_TO_SOT_SMD:SOT-23-5` |
 | U6 | VEML7700-TT | 4-pin 6.8×2.35 mm ⚠ | `sensor_hub:VEML7700` (project) | **TBD** |
 
@@ -23,7 +23,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 **U3 note**: DNP in v1 and slated for replacement by AD5933. KiCad 10 has no LMP91200 symbol, and the package in the old docs (SOIC-14) is unconfirmed — decide whether to keep U3 on the v1 board at all before layout.
 
-**U4 note**: the BOM description says SC70-5 but the footprint is SOT-23-5. Confirm the AD8603ARTZ package in ADI's ordering guide and use `Package_TO_SOT_SMD:SOT-23-5` or `Package_TO_SOT_SMD:SOT-353_SC-70-5` accordingly.
+**U4 note**: the BOM description said SC70-5; the KiCad AD8603 symbol defaults to TSOT-23-5, which is now used. Confirm against ADI's ordering guide before ordering.
 
 **U6 note**: the old docs listed a 2×2 mm ODFN-6. The VEML7700-TT is believed to be a 4-pin 6.8 × 2.35 mm package (the 2×2 mm variant is the VEML6030). The project symbol uses 1 = SCL, 2 = VDD, 3 = GND, 4 = SDA — **verify pin numbers and package against the Vishay datasheet** before drawing the footprint.
 

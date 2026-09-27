@@ -240,7 +240,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": ""
+      "sch_revision": "V2.0"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -526,6 +526,7 @@
       "netlist": "",
       "plot": "",
       "specctra_dsn": "",
+      "step": "",
       "vrml": ""
     },
     "page_layout_descr_file": ""
@@ -650,13 +651,18 @@
       {
         "filename": "sensor_hub.kicad_sch",
         "name": "sensor_hub",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "9b8dc3b9-e16c-e404-9a51-89bfb81076d7"
       }
     ],
     "used_designators": "",
     "variants": []
   },
-  "sheets": [],
+  "sheets": [
+    [
+      "9b8dc3b9-e16c-e404-9a51-89bfb81076d7",
+      "sensor_hub"
+    ]
+  ],
   "text_variables": {},
   "tuning_profiles": {
     "meta": {
