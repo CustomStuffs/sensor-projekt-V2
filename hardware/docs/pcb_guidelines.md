@@ -71,7 +71,9 @@ The relay bodies straddle the SELV/MAINS boundary: coil pins on the SELV side, c
 
 ## Digital Zone Rules
 
-7. **Pico W**: center placement, castellated pads soldered directly (no socket). Saves 3 mm board height for enclosure fit. Keep the Pico W antenna end pointing away from the MAINS zone and away from any copper pour.
+7. **Pico WH on sockets**: U1 uses `Module:RaspberryPi_Pico_Common_THT` (2 × 20 THT, 1 mm drill) for two 1×20 female headers, so a Pico WH (pre-soldered headers) plugs in and can be swapped. Stack height ≈ 8.5 mm socket + Pico — plan the 3D-printed enclosure for it. Keep the Pico W antenna end (opposite the USB connector) pointing away from the MAINS zone, with no copper pour and no traces under the antenna area on either layer.
+
+7a. **J11 spare-GPIO breakout**: 2×8 holes at 2.54 mm (no part fitted) next to U1, carrying GP4–GP7, GP18–GP22, GP26–GP28, RUN, 3V3_DIG and 2× GND. Keep traces short; GP26–28 are ADC-capable (0–3.3 V only). SELV side only.
 
 8. **ADS1115**: place at the analog/digital boundary. AGND pad connects to GND_ANA; VDD connects to 3V3_ANA; SDA/SCL to GND_DIG. 100 nF decoupling within 0.5 mm of VDD pin.
 

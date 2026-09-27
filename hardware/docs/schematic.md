@@ -46,6 +46,7 @@ GPIO direct:
   GP15 ── Relay 2 driver (→ Q3 BC817 base)
   GP16 ── Wago port 4 signal (generic)
   GP17 ── Wago port 5 signal (generic)
+  GP4–GP7, GP18–GP22, GP26–GP28, RUN ── J11 spare-GPIO solder holes (GP4–GP7 reserved for the v2 EC front-end SPI)
 ```
 
 ---
@@ -254,7 +255,7 @@ Single source for every reference. KiCad schematic, `bom.csv` and `footprints.md
 
 | Ref | Value | Function |
 |-----|-------|----------|
-| U1 | Pico W | MCU module |
+| U1 | Pico WH | MCU module, plugged into 2× 1×20 female headers |
 | U2 | ADS1115IDGSR | 16-bit ADC, I2C 0x48 |
 | U3 | LMP91200 | EC front-end — **DNP v1** |
 | U4 | AD8603 | pH unity-gain buffer |
@@ -267,6 +268,7 @@ Single source for every reference. KiCad schematic, `bom.csv` and `footprints.md
 | J9 | Phoenix 2-pin | VSYS + GND input |
 | J10 | Wago 3-pole mains | W7 = Relay 2 COM/NO/NC |
 | HDR1 | 1×4 header | Debug UART0 (GP0 TX, GP1 RX, GND, 3V3) |
+| J11 | 2×8 holes (DNP) | Spare-GPIO breakout: 1 GP4, 2 GP5, 3 GP6, 4 GP7, 5 GP18, 6 GP19, 7 GP20, 8 GP21, 9 GP22, 10 GP26, 11 GP27, 12 GP28, 13 RUN, 14 3V3_DIG, 15–16 GND |
 | K1, K2 | G2RL-1-E DC5 | Relays 1 and 2 |
 | Q1, Q3 | BC817-40 | Relay 1 / Relay 2 coil drivers |
 | Q2 | BSS84 | PIR power gate |

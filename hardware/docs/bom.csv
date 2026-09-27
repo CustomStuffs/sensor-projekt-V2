@@ -1,5 +1,6 @@
 ref,description,part_number,manufacturer,qty,unit_chf,ext_chf,distributor,notes
-U1,Raspberry Pi Pico W,SC0918,Raspberry Pi,1,5.50,5.50,Distrelec / Mouser,Pico W with WiFi; castellated pads
+U1,Raspberry Pi Pico WH (pre-soldered headers),SC0919,Raspberry Pi,1,6.50,6.50,Distrelec / Mouser,Pico W with headers; plugs into U1 sockets; price est.
+U1-SKT,Female header 1x20 2.54mm THT (socket for Pico WH),"generic 1x20 female, 8.5 mm",various,2,0.60,1.20,Distrelec / Mouser,Two sockets for U1 footprint RaspberryPi_Pico_Common_THT; price est.
 U2,16-bit I2C ADC 4ch VSSOP-10,ADS1115IDGSR,Texas Instruments,1,1.50,1.50,Mouser 595-ADS1115IDGSR,I2C addr 0x48 (ADDR to GND)
 U3,EC analog frontend SPI SOIC-14,LMP91200SD/NOPB,Texas Instruments,1,3.50,0.00,Mouser 926-LMP91200SDNOPB,**DNP v1** — EOL/unavailable (May 2026); footprint retained for v2 AD5933 redesign
 U4,Op-amp FET-in rail-to-rail TSOT-23-5,AD8603ARTZ-R2,Analog Devices,1,1.20,1.20,Mouser 584-AD8603ARTZ-R2,pH unity-gain buffer; single supply 3.3V
@@ -29,8 +30,8 @@ C17-C18,Cap 1uF 0603 X5R 10V,GRM188R61A105KA61D,Murata,2,0.08,0.16,Mouser 81-GRM
 C19-C20,Cap 100nF X2 film 275VAC THT,"X2 film 100nF 275VAC, 13x6 mm body, 10 mm pitch (e.g. WIMA MKX2)",Vishay / KEMET,2,0.40,0.80,Mouser,Relay contact EMC snubbers (series with R19/R20); X2 mandatory (230 VAC); DNP per channel for LED/contactor loads; footprint C_Rect_L13.0mm_W6.0mm_P10.00mm — verify body size of chosen part
 PCB,2-layer FR4 ENIG 100x80mm (qty 10),Custom,JLCPCB,1,1.50,1.50,jlcpcb.com,2-layer 1.6mm; order 10 minimum
 HDR1,2.54mm 1x4 debug header,PEC04SAAN,Sullins,1,0.20,0.20,Mouser 538-22-28-4040,UART0 TX RX + GND + 3V3
-U6,Ambient light sensor I2C 4-pin 6.8x2.35mm,VEML7700-TT,Vishay,1,0.80,0.80,Mouser 782-VEML7700-TT,I2C addr 0x10 (fixed). VERIFY package: VEML7700-TT is believed to be 4-pin 6.8x2.35 mm (2x2 mm ODFN is VEML6030)
+U6,Ambient light sensor I2C 4-pin 6.8x2.35x3.0mm top view,VEML7700-TT,Vishay,1,0.80,0.80,Mouser 782-VEML7700-TT,I2C addr 0x10 (fixed). Footprint sensor_hub:VEML7700_TT (datasheet 84286 p.10)
 Q2,P-channel MOSFET SOT-23,BSS84PXUMA1,Infineon,1,0.10,0.10,Mouser 771-BSS84PXUMA1,PIR power gate (GP12); Vgs(th) -0.8 to -2.5V; Id -130mA; source→3V3_DIG drain→PIR VCC
 J9,2-pin screw terminal 5mm pitch,PT 1.5/2-5-H,Phoenix Contact,1,0.30,0.30,Mouser (verify SKU),VSYS + GND PCB-side input; connects to Bulgin PX0441 panel connector via short cable
 ,,,,,,,,
-,,TOTAL,,,,28.88,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers
+,,TOTAL,,,,31.08,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers

@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "sensor_hub")(type "KiCad")(uri "${KIPRJMOD}/sensor_hub.pretty")(options "")(descr "Project footprints not in the KiCad library"))
+)

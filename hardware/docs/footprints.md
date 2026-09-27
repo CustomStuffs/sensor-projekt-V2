@@ -2,7 +2,7 @@
 
 Map every BOM line to its KiCad library footprint before starting schematic entry.
 Checked against the KiCad **10.0** standard libraries (Sep 2026).
-Remaining TBD: U6 (VEML7700) only.
+All footprints assigned. Project footprints: `sensor_hub:VEML7700_TT`.
 Flags: ⚠ = verify against datasheet before placing; ✗ = DNP v1; **TBD** = not in the KiCad library, project footprint still to be drawn.
 
 Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbols). A project footprint library `kicad/sensor_hub.pretty` will be added for the TBD footprints.
@@ -13,12 +13,12 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 | Ref | Part | Package | KiCad symbol | KiCad footprint |
 |-----|------|---------|--------------|-----------------|
-| U1 | Pico W SC0918 | Castellated | `MCU_Module:RaspberryPi_Pico_W` | `Module:RaspberryPi_Pico_W_SMD` |
+| U1 | Pico WH (SC0919) on sockets | 2× 1×20 THT, 2.54 mm | `MCU_Module:RaspberryPi_Pico_W` | `Module:RaspberryPi_Pico_Common_THT` |
 | U2 | ADS1115IDGSR | VSSOP-10 | `Analog_ADC:ADS1115IDGS` | `Package_SO:MSOP-10_3x3mm_P0.5mm` |
 | U3 ✗ | LMP91200SD/NOPB | ⚠ open | ⚠ none in KiCad 10 | `Package_SO:SOIC-14_3.9x8.7mm_P1.27mm` ⚠ |
 | U4 | AD8603ARTZ-R2 | TSOT-23-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:TSOT-23-5` (KiCad symbol default) ⚠ |
 | U5 | AP2112K-3.3TRG1 | SOT-23-5 | `Regulator_Linear:AP2112K-3.3` | `Package_TO_SOT_SMD:SOT-23-5` |
-| U6 | VEML7700-TT | 4-pin 6.8×2.35 mm ⚠ | `sensor_hub:VEML7700` (project) | **TBD** |
+| U6 | VEML7700-TT | 4-pin, top view | `sensor_hub:VEML7700` (project) | `sensor_hub:VEML7700_TT` (project) |
 
 **U2 note**: DGS suffix = VSSOP-10 (3×3 mm, 0.5 mm pitch). KiCad 10 names this land pattern `MSOP-10_3x3mm_P0.5mm` (same footprint).
 
@@ -26,7 +26,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 **U4 note**: the BOM description said SC70-5; the KiCad AD8603 symbol defaults to TSOT-23-5, which is now used. Confirm against ADI's ordering guide before ordering.
 
-**U6 note**: the old docs listed a 2×2 mm ODFN-6. The VEML7700-TT is believed to be a 4-pin 6.8 × 2.35 mm package (the 2×2 mm variant is the VEML6030). The project symbol uses 1 = SCL, 2 = VDD, 3 = GND, 4 = SDA — **verify pin numbers and package against the Vishay datasheet** before drawing the footprint.
+**U6 note**: pinout 1 = SCL, 2 = VDD, 3 = GND, 4 = SDA and pad pattern (4 × 0.7 × 1.6 mm, pitch 1.27 mm, "Top View" layout) taken from Vishay datasheet 84286 Rev. 1.8, p. 1 and p. 10. Pin 1 is marked with a silk dot. The body outline on F.Fab is approximate — the datasheet gives no body-to-pad offset for top-view mounting; check against a real part before placing it near other parts.
 
 ---
 
@@ -70,3 +70,4 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 | J8 | Phoenix PT 1.5/4-3.5-H | THT 4-pin 3.5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal` |
 | J9 | Phoenix PT 1.5/2-5-H | THT 2-pin 5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal` |
 | HDR1 | PEC04SAAN | 2.54 mm 1×4 | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` |
+| J11 | — (DNP, holes only) | 2.54 mm 2×8 | `Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical` |
