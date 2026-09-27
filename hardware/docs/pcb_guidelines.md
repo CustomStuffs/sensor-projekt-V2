@@ -1,6 +1,8 @@
 # PCB Layout Guidelines
 
-Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
+Board: **100 × 100 mm** (was 100 × 80; enlarged Sep 2026 to fit the 8 mm MAINS separation and the socketed Pico WH — still inside the ≤ 100 × 100 mm low-cost fab tier), 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers. Enclosure is 3D-printed to fit.
+
+**Design rules live in the project:** net classes in `kicad/sensor_hub.kicad_pro` (Default 0.25/0.15, Power 0.5, VSYS 0.8, MAINS 3.0 mm tracks) and custom rules in `kicad/sensor_hub.kicad_dru` (MAINS ↔ SELV 8 mm clearance + creepage + hole clearance, MAINS K1 ↔ K2 4 mm, same channel 1.5 mm). Rule areas on the board: `MAINS_keepout` (no pour, no vias), `pH_highZ_keepout` (no pour), `PicoW_antenna_keepout` (no pour, no tracks).
 
 **Design decision (Sep 2026): relay contacts are rated for 230 VAC mains.** Anything up to 48 V DC is covered by the same layout. The board is therefore split into a **SELV side** (everything low-voltage, including the pH/EC probes that sit in water) and a **MAINS zone** (relay contacts, snubbers, W6/W7). The two are separated by **reinforced insulation**.
 
@@ -18,7 +20,7 @@ Board: 100 × 80 mm, 2-layer FR4 1.6 mm, ENIG finish, 1 oz copper both layers.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  100 mm × 80 mm — TOP VIEW                        [J9 VSYS in]       │
+│  100 mm × 100 mm — TOP VIEW (schematic only — see the KiCad board for real placement)                        [J9 VSYS in]       │
 │                                                                      │
 │  ┌─────────────────┐  ┌─────────────────────────────┐ ║ ┌──────────┐ │
 │  │  ANALOG ZONE    │  │       DIGITAL ZONE          │ ║ │  MAINS   │ │

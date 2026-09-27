@@ -2,7 +2,7 @@
 
 Map every BOM line to its KiCad library footprint before starting schematic entry.
 Checked against the KiCad **10.0** standard libraries (Sep 2026).
-All footprints assigned. Project footprints: `sensor_hub:VEML7700_TT`.
+All footprints assigned. J1 was changed from Amphenol 031-6575 (an isolated BNC whose footprint splits shield and shell into separate pads) to TE 1-1478035-0 (all shield pads = pad 2). Project footprints: `sensor_hub:VEML7700_TT`.
 Flags: ⚠ = verify against datasheet before placing; ✗ = DNP v1; **TBD** = not in the KiCad library, project footprint still to be drawn.
 
 Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbols). A project footprint library `kicad/sensor_hub.pretty` will be added for the TBD footprints.
@@ -64,7 +64,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 | Ref | Part | Type | KiCad footprint |
 |-----|------|------|-----------------|
-| J1 | Amphenol 031-6575 | RA BNC | `Connector_Coaxial:BNC_Amphenol_031-6575_Horizontal` (symbol `Connector:Conn_Coaxial`) |
+| J1 | TE 1-1478035-0 | RA BNC, 4 pins (1 = center, all others = shield) | `Connector_Coaxial:BNC_TEConnectivity_1478035_Horizontal` (symbol `Connector:Conn_Coaxial`) |
 | J2–J6 | Wago 2601-1103 | THT 3-pole 3.5 mm (SELV sensors W1–W5) | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1103_1x03_P3.50mm_Horizontal` |
 | J7, J10 | Wago 236-403 | THT 3-pole 5 mm, mains (W6/W7), 24 A IEC / 300 V UL | `TerminalBlock_WAGO:TerminalBlock_WAGO_236-403_1x03_P5.00mm_45Degree` |
 | J8 | Phoenix PT 1.5/4-3.5-H | THT 4-pin 3.5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal` |

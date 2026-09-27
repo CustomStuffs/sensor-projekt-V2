@@ -12,7 +12,7 @@ Q1,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,
 Q3,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 2 driver
 K1,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,5V coil ≈80 mA from VSYS; 16 A 250 VAC; 5 kVAC reinforced coil-contact (required for 230 VAC next to SELV); price est.
 K2,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,Second on-board relay (minimum requirement); same part as K1
-J1,BNC female right-angle PCB mount,031-6575,Amphenol RF,1,2.50,2.50,Mouser 523-31-6575,pH sensor connector; KiCad footprint BNC_Amphenol_031-6575_Horizontal; price est.
+J1,BNC female right-angle PCB mount 50 Ohm,1-1478035-0,TE Connectivity,1,2.50,2.50,Mouser / Distrelec,pH sensor connector; shell = shield = VREF_MID (not GND); KiCad footprint BNC_TEConnectivity_1478035_Horizontal; price est.
 J2-J6,Wago 3-pole push-in PCB terminal 3.5mm pitch (SELV sensors),2601-1103,Wago,5,0.90,4.50,Distrelec / Wago direct,Sensor ports W1-W5 (SELV side only); price est.
 J7 J10,Wago 3-pole CAGE CLAMP PCB terminal 5mm pitch 45°,236-403,Wago,2,1.20,2.40,Distrelec / Wago direct,Relay ports W6 = J7 (K1) + W7 = J10 (K2) in MAINS zone; 2.5 mm²; 24 A (IEC) / 300 V 15 A (UL); price est.
 J8,4-pin terminal block 3.5mm pitch,PT 1.5/4-3.5-H,Phoenix Contact,1,0.40,0.40,Mouser 651-1984617,EC sensor 4-wire connection

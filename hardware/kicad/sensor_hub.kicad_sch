@@ -10641,7 +10641,7 @@
 				)
 			)
 		)
-		(property "Value" "031-6575"
+		(property "Value" "1-1478035-0"
 			(at 38.481 88.9 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10651,7 +10651,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_Coaxial:BNC_Amphenol_031-6575_Horizontal"
+		(property "Footprint" "Connector_Coaxial:BNC_TEConnectivity_1478035_Horizontal"
 			(at 35.56 88.9 0)
 			(hide yes)
 			(show_name no)
