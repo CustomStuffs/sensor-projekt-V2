@@ -30,6 +30,11 @@ The clear lid lets you see the status LED without drilling.
 | EC sensor cable | Wiska ClikPlug M20 | IP68 | 8–14 mm | 1 | Thicker 4-wire cable |
 | USB-C power | Bulgin PX0441/B/4M00 | IP68 | Panel mount | 1 | 5V input feedthrough |
 | pH BNC external | Amphenol 31-221-RFX | IP67 | Panel mount | 1 | External probe connector |
+| Relay mains cables (W6, W7) | Wiska ClikPlug M20 | IP68 | 8–14 mm | 2 | 230 VAC load cables; enter on the MAINS side of the box, away from sensor glands |
+
+**Mains wiring inside the enclosure**: keep 230 VAC load cables on the MAINS side of the box, tied down so a loose conductor cannot reach the SELV side of the PCB. Double-insulated cable (sheath stripped only as far as needed at W6/W7). If the enclosure has any metal parts (e.g. mounting plate), they must be earthed by the electrician.
+
+**⚠ Enclosure size**: the Hammond 1554T2GYCL (115 × 65 mm external) is smaller than the 100 × 80 mm PCB — re-check enclosure choice before finalising the board outline.
 
 ---
 

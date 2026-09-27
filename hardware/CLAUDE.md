@@ -25,13 +25,20 @@ An empty V1 skeleton also exists at `../PCB/V1 pico sensorhub/` (historical, ign
 - Drivers: GP10 → K1, GP15 → K2. Each has its own BC817 + 1N4148 flyback.
 
 ### Analog zone (bottom-left PCB quadrant)
-- Copper pour keepout on both layers under AD8603 and 10 MΩ resistors
+- Copper pour keepout on both layers under AD8603, the 10 MΩ input resistor (R1) and BAV99
+- AD8603 is a plain unity-gain follower (IN– tied to OUT); no resistor from VREF to IN–
 - Route the high-impedance node (between 10 MΩ and AD8603 IN+) with a guard ring tied to AD8603 output — this eliminates PCB surface leakage that corrupts pH readings
 - Single-point AGND/DGND join at ADS1115 AGND pin
-- Separate 3V3_ANA pour fed by AP2112K LDO (isolated from digital 3V3)
+- Separate 3V3_ANA pour fed by AP2112K LDO from VSYS (isolated from digital 3V3)
+- Reference designators: `docs/schematic.md` → "Reference Designators (master list)" is authoritative
 
-### Relay zone (right board edge)
-- 4 mm minimum creepage between relay contact traces and any logic net
+### Relay zone / MAINS zone (right board side, 230 VAC)
+- Relay contacts are rated for 230 VAC, 5 A per channel (covers ≤ 48 V DC too)
+- Relays: Omron G2RL-1-E DC5 — reinforced coil–contact insulation; never substitute a basic-insulation relay (e.g. Songle SRD)
+- **8 mm creepage and clearance** between any mains net and any SELV net, both layers; enforce with a `MAINS` netclass DRC rule
+- 2 mm routed isolation slot between relay coil and contact pins and along the MAINS/SELV boundary
+- No pour, vias or SELV traces in the MAINS zone; mains traces ≥ 3.0 mm
+- Snubbers use X2 capacitors and 1206 resistors; W6/W7 are mains-rated THT terminals inside the MAINS zone
 - 1N4148 flyback diode directly across each relay coil pads
 - Relay coils driven from VSYS (5V), not 3V3
 
