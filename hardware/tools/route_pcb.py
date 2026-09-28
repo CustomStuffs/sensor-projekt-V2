@@ -55,9 +55,9 @@ def zones():
 
 if stage == "pre":
     TR = b.Tracks()
-    for t in [TR[i] for i in range(len(TR))]: b.Remove(t)
+    for t in [TR[i] for i in range(len(TR))]: b.Delete(t)
     for z in zones():
-        if z.GetZoneName().startswith(("TEMP_", "GND", "GUARD")): b.Remove(z)
+        if z.GetZoneName().startswith(("TEMP_", "GND", "GUARD")): b.Delete(z)
 
     # antenna keepout only between the pin rows (was over the pads -> pins 15-26 unroutable)
     for z in zones():
@@ -91,6 +91,35 @@ if stage == "pre":
     track([r1, knee, u4], "/NODE_A", 0.25)
     track([knee, d1], "/NODE_A", 0.25)
 
+    # ── 3V3_ANA: leave U2 pin 8 thin (0.5 mm pitch), then Power width to C7 ─────
+    u2, c7 = pad("U2", "8"), pad("C7", "1")
+    track([u2, (u2[0] + 1.2, u2[1])], "/3V3_ANA", 0.25)
+    track([(u2[0] + 1.2, u2[1]), (u2[0] + 1.2 + (c7[1] - u2[1]), c7[1]), c7], "/3V3_ANA", 0.5)
+
+    # ── spare GPIO U1 -> J11: down the 1.2 mm gap between the antenna keepout (x 46.8)
+    # and the right pin row, two lanes per layer, then straight to J11 under the Pico.
+    # Leaves the channel right of the Pico to the autorouter (pins 21-25 escape there).
+    # Per layer: upper Pico pin = inner lane = upper run, dropping further left, so
+    # nothing crosses.
+    j = {n: pad("J11", n) for n in ("7", "8", "9", "10", "12")}
+    mid = lambda a, c: (a + c) / 2
+    for layer, pairs in ((pcbnew.B_Cu, (("27", "8", "/GP21", j["8"][0]),
+                                        ("26", "7", "/GP20", mid(j["8"][0], j["10"][0])))),
+                         (pcbnew.F_Cu, (("31", "10", "/GP26", j["10"][0]),
+                                        ("29", "9", "/GP22", mid(j["10"][0], j["12"][0]))))):
+        for i, (up, jp, nm, drop_x) in enumerate(pairs):
+            s, e = pad("U1", up), j[jp]
+            lane, run = 47.2 + 0.43 * i, 56.0 + 0.45 * i       # U1's own antenna keepout ends at x 46.99
+            pts = [s, (lane, s[1]), (lane, run), (drop_x, run), (drop_x, e[1])]
+            if drop_x != e[0]: pts.append(e)
+            track(pts, nm, 0.25, layer)
+
+    # ── guard pour on B.Cu needs its own connection to PH_BUF (U4 pin 4) ──────
+    u4p4 = pad("U4", "4"); gv = (u4p4[0] + 1.26, u4p4[1])
+    track([u4p4, gv], "/PH_BUF", 0.25)
+    v = pcbnew.PCB_VIA(b); v.SetPosition(P(*gv)); v.SetWidth(MM(0.8)); v.SetDrill(MM(0.4))
+    v.SetNet(net("/PH_BUF")); v.SetLocked(True); b.Add(v)
+
     # ── temporary track keepouts for the autorouter ─────────────────────────
     # MAINS band + 8 mm margin (SELV copper must stay >= 8 mm from MAINS copper)
     poly_zone("TEMP_MAINS", None, None, rectpts(52.6, 10.3, 100, 56.0), 0, keepout=True)
@@ -112,8 +141,33 @@ else:  # finish
     TR = b.Tracks()                                # before any zone access: that breaks TRACKS wrappers
     for t in [TR[i] for i in range(len(TR))]:
         if t.GetClass() == "PCB_TRACK" and t.GetWidth() < MM(0.2): t.SetWidth(MM(0.2))
+    # Freerouting leaves vias/stubs that connect on one side only: strip them (signal nets only;
+    # vias on pour nets are stitching). Repeat until nothing more dangles.
+    POUR = {"/GND", "/GND_ANA", "/PH_BUF"}
+    tol = MM(0.01)
+    pads = {}
+    for f in b.GetFootprints():
+        for p in f.Pads(): pads.setdefault(p.GetNetname(), []).append(p)
+    removed = 0
+    while True:
+        TR = b.Tracks(); items = [TR[i] for i in range(len(TR))]
+        segs = [x for x in items if x.GetClass() == "PCB_TRACK"]
+        vias = [x for x in items if x.GetClass() == "PCB_VIA"]
+        def hit(pt, n, layer, skip):
+            if any(p.IsOnLayer(layer) and p.HitTest(pt, tol) for p in pads.get(n, [])): return True
+            if any(v is not skip and v.GetNetname() == n and v.HitTest(pt, tol) for v in vias): return True
+            return any(s is not skip and s.GetNetname() == n and s.GetLayer() == layer and s.HitTest(pt, tol) for s in segs)
+        dead = [v for v in vias if v.GetNetname() not in POUR and not v.IsLocked()
+                and not all(hit(v.GetPosition(), v.GetNetname(), L, v) for L in (pcbnew.F_Cu, pcbnew.B_Cu))]
+        dead += [s for s in segs if s.GetNetname() not in POUR and not s.IsLocked()
+                 and not all(hit(pt, s.GetNetname(), s.GetLayer(), s) for pt in (s.GetStart(), s.GetEnd()))]
+        if not dead: break
+        for x in dead: b.Delete(x)
+        removed += len(dead)
+    print("removed dangling vias/stubs:", removed)
+
     for z in zones():
-        if z.GetZoneName().startswith("TEMP_"): b.Remove(z)
+        if z.GetZoneName().startswith("TEMP_"): b.Delete(z)
     board = rectpts(0.3, 0.3, 99.7, 99.7)
     ana = rectpts(0.3, 11.0, 27.6, 77.5)          # analog column: LDO out, ADC, pH, NTC
     guard = rectpts(15.8, 45.0, 28.2, 51.2)       # around R1 / D1 / U4 (+ NODE_A)

@@ -11,11 +11,16 @@ fi
   https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1.jar
 JAVA=$(ls "$C"/jdk-25*/bin/java | head -1)
 T=hardware/tools
-python3 $T/route_pcb.py pre  "$W/board.dsn" "$W/board.ses" 2>&1 | grep -E "done|Error|Trace" || true
+step() {  # run a route_pcb.py stage; on failure show the error and stop
+  python3 $T/route_pcb.py "$1" "$W/board.dsn" "$W/board.ses" > "$W/$1.log" 2>&1 \
+    || { grep -v "PROPERTY_ENUM\|memory leak" "$W/$1.log" | tail -8; echo "route_pcb.py $1 failed (exit $?)"; exit 1; }
+  grep -E "done|import|removed" "$W/$1.log"
+}
+step pre
 "$JAVA" -Djava.awt.headless=true -jar "$C/freerouting-2.4.1.jar" -de "$W/board.dsn" -do "$W/board.ses" \
   -mp 30 -mt 4 --gui.enabled=false > "$W/freerouting.log" 2>&1
 grep -E "^  Net '" "$W/freerouting.log" || true
-python3 $T/route_pcb.py post "$W/board.dsn" "$W/board.ses" 2>&1 | grep -E "done|import|Error|Trace" || true
+step post
 kicad-cli pcb drc --severity-error --severity-warning -o "$W/drc.rpt" hardware/kicad/sensor_hub.kicad_pcb >/dev/null 2>&1 || true
 grep -oE "^\[[a-z_]+\]" "$W/drc.rpt" | sort | uniq -c | sort -rn
 echo "logs + DRC report: $W"

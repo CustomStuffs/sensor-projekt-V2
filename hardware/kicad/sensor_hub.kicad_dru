@@ -25,3 +25,9 @@
 (rule "MAINS K1 to K2"
 	(condition "A.hasNetclass('MAINS') && B.hasNetclass('MAINS') && A.NetName == '/K1_*' && B.NetName == '/K2_*'")
 	(constraint clearance (min 4mm)))
+
+# Socket/header GND pins sit between signal tracks; THT pads reach the GND pour on
+# both layers, so one thermal spoke per layer is enough there.
+(rule "Header GND pins: 1 spoke"
+	(condition "A.Type == 'Pad' && A.NetName == '/GND' && (A.memberOfFootprint('U1') || A.memberOfFootprint('J11'))")
+	(constraint min_resolved_spokes 1))

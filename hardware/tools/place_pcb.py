@@ -130,7 +130,7 @@ def rule_area(name, x0, y0, x1, y1, no_pour=True, no_vias=True, no_tracks=False)
         o.Append(P(x, y).x, P(x, y).y)
     b.Add(z)
 rule_area("MAINS_keepout", 57.5, 13.0, 100, 53.3)            # no pour, no vias in MAINS band
-rule_area("PicoW_antenna_keepout", 28.5, 42, 51.5, 55.5, no_tracks=True)   # antenna end of Pico W
+rule_area("PicoW_antenna_keepout", 33.0, 42, 46.8, 55.5, no_tracks=True)   # antenna end of Pico W, between the pin rows only
 
 # ── silkscreen labels ──────────────────────────────────────────────────────
 def silk(t, x, y, size=1.2, rot=0):
