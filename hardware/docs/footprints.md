@@ -24,7 +24,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 
 **U3 note**: DNP in v1 and slated for replacement by AD5933. KiCad 10 has no LMP91200 symbol, and the package in the old docs (SOIC-14) is unconfirmed — decide whether to keep U3 on the v1 board at all before layout.
 
-**U4 note**: the BOM description said SC70-5; the KiCad AD8603 symbol defaults to TSOT-23-5, which is now used. Confirm against ADI's ordering guide before ordering.
+**U4 note**: TSOT-23-5 = order code AD8603AUJZ (JLCPCB/LCSC C14937, AD8603AUJZ-REEL7). The old BOM entry "AD8603ARTZ-R2" is not a valid ADI part number.
 
 **U6 note**: pinout 1 = SCL, 2 = VDD, 3 = GND, 4 = SDA and pad pattern (4 × 0.7 × 1.6 mm, pitch 1.27 mm, "Top View" layout) taken from Vishay datasheet 84286 Rev. 1.8, p. 1 and p. 10. Pin 1 is marked with a silk dot. The body outline on F.Fab is approximate — the datasheet gives no body-to-pad offset for top-view mounting; check against a real part before placing it near other parts.
 
@@ -67,7 +67,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 | J1 | TE 1-1478035-0 | RA BNC, 4 pins (1 = center, all others = shield) | `Connector_Coaxial:BNC_TEConnectivity_1478035_Horizontal` (symbol `Connector:Conn_Coaxial`) |
 | J2–J6 | Wago 2601-1103 | THT 3-pole 3.5 mm (SELV sensors W1–W5) | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1103_1x03_P3.50mm_Horizontal` |
 | J7, J10 | Wago 236-403 | THT 3-pole 5 mm, mains (W6/W7), 24 A IEC / 300 V UL | `TerminalBlock_WAGO:TerminalBlock_WAGO_236-403_1x03_P5.00mm_45Degree` |
-| J8 | Phoenix PT 1.5/4-3.5-H | THT 4-pin 3.5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal` |
-| J9 | Phoenix PT 1.5/2-5-H | THT 2-pin 5 mm | `TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal` |
+| J8 | Wago 2601-1104 | THT 4-pole push-in 3.5 mm | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1104_1x04_P3.50mm_Horizontal` |
+| J9 | Wago 2601-1102 | THT 2-pole push-in 3.5 mm | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1102_1x02_P3.50mm_Horizontal` |
 | HDR1 | PEC04SAAN | 2.54 mm 1×4 | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` |
 | J11 | — (DNP, holes only) | 2.54 mm 2×8 | `Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical` |

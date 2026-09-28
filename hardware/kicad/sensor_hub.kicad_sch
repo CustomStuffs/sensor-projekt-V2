@@ -9805,7 +9805,7 @@
 				)
 			)
 		)
-		(property "Value" "Phoenix-EC4pin"
+		(property "Value" "Wago-EC4pin"
 			(at 35.56 182.88 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9815,7 +9815,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1104_1x04_P3.50mm_Horizontal"
 			(at 35.56 175.26 0)
 			(hide yes)
 			(show_name no)
@@ -11834,7 +11834,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "AD8603ARTZ-R2"
+		(property "Value" "AD8603AUJZ"
 			(at 109.22 93.98 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12516,7 +12516,7 @@
 				)
 			)
 		)
-		(property "Value" "Phoenix-Power"
+		(property "Value" "Wago-Power"
 			(at 35.56 50.8 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12526,7 +12526,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal"
+		(property "Footprint" "TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1102_1x02_P3.50mm_Horizontal"
 			(at 35.56 45.72 0)
 			(hide yes)
 			(show_name no)

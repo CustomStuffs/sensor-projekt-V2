@@ -3,7 +3,8 @@ Outline 100x100, mounting holes, isolation slots, rule areas, zone-based placeme
 Board coordinates: (0,0) = top-left board corner = page (OX, OY)."""
 import pcbnew
 
-F = "hardware/kicad/sensor_hub.kicad_pcb"
+import sys
+F = sys.argv[1] if len(sys.argv) > 1 else "hardware/kicad/sensor_hub.kicad_pcb"
 b = pcbnew.LoadBoard(F)
 MM = pcbnew.FromMM
 OX, OY, W, H = 40.0, 40.0, 100.0, 100.0
@@ -32,18 +33,23 @@ rect(0, 0, W, H)                                  # board outline
 rect(62.0, 11.0, 84.0, 13.0)                      # isolation slot under K1: coil (top) | contacts
 rect(62.0, 53.3, 84.0, 55.3)                      # isolation slot under K2: contacts | coil (bottom)
 
-# ── J1: swap to TE 1-1478035-0 (keeps nets/UUID path) ──────────────────────
-old = FP("J1")
-if "1478035" not in old.GetFPIDAsString():
-    new = pcbnew.FootprintLoad("/usr/share/kicad/footprints/Connector_Coaxial.pretty", "BNC_TEConnectivity_1478035_Horizontal")
-    new.SetFPID(pcbnew.LIB_ID("Connector_Coaxial", "BNC_TEConnectivity_1478035_Horizontal"))
-    new.SetReference("J1"); new.SetValue("1-1478035-0"); new.SetPath(old.GetPath())
+# ── footprint swaps (keep nets / UUID path; schematic carries the same footprint) ──
+def swap(ref, lib, name, value, fallback_pad=None):
+    old = FP(ref)
+    if old.GetFPIDAsString() == "%s:%s" % (lib, name): return
+    new = pcbnew.FootprintLoad("/usr/share/kicad/footprints/%s.pretty" % lib, name)
+    new.SetFPID(pcbnew.LIB_ID(lib, name))
+    new.SetReference(ref); new.SetValue(value); new.SetPath(old.GetPath())
     new.GetField(pcbnew.FIELD_T_DESCRIPTION).SetText(old.GetField(pcbnew.FIELD_T_DESCRIPTION).GetText())
     nets = {p.GetNumber(): p.GetNet() for p in old.Pads()}
     b.Add(new)
     for p in new.Pads():
-        p.SetNet(nets.get(p.GetNumber()) or nets.get("2"))
+        p.SetNet(nets.get(p.GetNumber()) or nets.get(fallback_pad))
     b.Delete(old)
+swap("J1", "Connector_Coaxial", "BNC_TEConnectivity_1478035_Horizontal", "1-1478035-0", "2")   # all shell pads = shield
+# push-in instead of screw terminals, same Wago 2601 family as the sensor ports
+swap("J8", "TerminalBlock_WAGO", "TerminalBlock_WAGO_2601-1104_1x04_P3.50mm_Horizontal", "Wago-EC4pin")
+swap("J9", "TerminalBlock_WAGO", "TerminalBlock_WAGO_2601-1102_1x02_P3.50mm_Horizontal", "Wago-Power")
 
 # ── mounting holes (M3, no copper) ─────────────────────────────────────────
 for i, (x, y) in enumerate([(3.5, 3.5), (3.5, 96.5), (96.5, 96.5), (96.5, 3.5)], 1):
@@ -71,10 +77,10 @@ def ctr(ref, rot, x, y):
 # POWER (top left) — J9 wire entry toward top edge
 tl("J9", 180, 8.5, 0.3)
 for ref, x in (("C13", 4), ("C11", 8), ("C14", 12), ("C17", 16), ("C8", 20)):
-    ctr(ref, 90, x, 14)
-ctr("U5", 0, 12, 19.5)
+    ctr(ref, 90, x, 17.8)
+ctr("U5", 0, 12, 23)
 for ref, x in (("C15", 4), ("C18", 8), ("C12", 12)):
-    ctr(ref, 90, x, 25)
+    ctr(ref, 90, x, 28.3)
 ctr("R10", 90, 23, 5); ctr("R11", 90, 26, 5)           # I2C pull-ups near Pico GP2/GP3
 ctr("U6", 0, 21.5, 24.5); ctr("C9", 0, 21.5, 28.5)       # light sensor
 # ADC
@@ -107,9 +113,9 @@ ctr("R20", 270, 66, 44)     # pad1 K2_COM above, pad2 SNUB below
 ctr("C10", 90, 53.5, 5); ctr("Q1", 0, 58, 4); ctr("R8", 0, 58, 8.5); ctr("D2", 0, 63.5, 4)
 ctr("Q3", 0, 58, 62); ctr("R18", 0, 58, 66); ctr("D3", 0, 63.5, 62.3)
 # SENSOR PORTS along bottom edge (wire entry toward bottom edge)
-for ref, x in (("J2", 23.2), ("J3", 36.9), ("J4", 50.6), ("J5", 64.3), ("J6", 78.0)):
+for ref, x in (("J2", 23.8), ("J3", 37.5), ("J4", 51.2), ("J5", 64.9), ("J6", 78.6)):
     tl(ref, 0, x, 84.2)
-tl("J8", 0, 7.5, 91.2)
+tl("J8", 0, 7.0, 84.2)                            # same row/depth as J2-J6, clear of H2
 ctr("R5", 0, 30, 80.5); ctr("R6", 0, 43.5, 80.5); ctr("R9", 0, 55, 80.5)
 ctr("Q2", 0, 61, 78); ctr("R17", 0, 61, 74)
 
@@ -137,14 +143,14 @@ def silk(t, x, y, size=1.2, rot=0):
     s = pcbnew.PCB_TEXT(b); s.SetText(t); s.SetPosition(P(x, y)); s.SetLayer(pcbnew.F_SilkS)
     s.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size))); s.SetTextThickness(MM(size * 0.15))
     s.SetTextAngleDegrees(rot); b.Add(s)
-for t, x in (("W1 DS18B20", 29.8), ("W2 DHT22", 43.5), ("W3 PIR", 57.2), ("W4 GP16", 70.9), ("W5 GP17", 84.6)):
+for t, x in (("W1 DS18B20", 30.4), ("W2 DHT22", 44.1), ("W3 PIR", 57.8), ("W4 GP16", 71.5), ("W5 GP17", 85.2)):
     silk(t, x, 86.3, 1.0)                        # inside the terminal outline, above the pins
-silk("EC  W Y R B", 15, 88.4, 1.0)                  # clear of the J8 reference
+silk("EC  W Y R B", 15.3, 86.3, 1.0)                # inside the J8 outline, like W1-W5
 silk("W6 RELAY1", 92.5, 13.9, 1.0); silk("W7 RELAY2", 92.5, 52.1, 1.0)
 for t_, y_ in (("NC", 19), ("COM", 24), ("NO", 29), ("NO", 37.3), ("COM", 42.3), ("NC", 47.3)):
     silk(t_, 81.5, y_, 0.9)                      # on the (masked) mains track it names
 silk("! 230 VAC max 5 A", 73.5, 33.2, 1.2)
-silk("PH", 3, 43, 1.2); silk("5V IN", 7.0, 11.0, 1.0)
+silk("PH", 3, 43, 1.2); silk("5V IN", 5.2, 11.0, 1.0)
 silk("Sensor Hub V2.0  2026-09", 80, 74, 1.2)
 
 # reference fields that would land on neighbours
@@ -154,6 +160,7 @@ def ref_at(ref, x, y, rot, size=None):
 ref_at("C19", 57.25, 24.0, 90)                   # left of the cap, like C20
 ref_at("R19", 66.0, 20.9, 0, 0.8)                # no room beside R19 (C19 | K1 outline)
 ref_at("R20", 66.0, 47.1, 0, 0.8)
+ref_at("J9", 19.8, 8.0, 90)                      # beside the (deep) Wago, not on the cap row below
 
 b.Save(F)
 print("saved")

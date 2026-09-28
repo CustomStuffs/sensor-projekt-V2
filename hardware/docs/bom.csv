@@ -1,37 +1,37 @@
-ref,description,part_number,manufacturer,qty,unit_chf,ext_chf,distributor,notes
-U1,Raspberry Pi Pico WH (pre-soldered headers),SC0919,Raspberry Pi,1,6.50,6.50,Distrelec / Mouser,Pico W with headers; plugs into U1 sockets; price est.
-U1-SKT,Female header 1x20 2.54mm THT (socket for Pico WH),"generic 1x20 female, 8.5 mm",various,2,0.60,1.20,Distrelec / Mouser,Two sockets for U1 footprint RaspberryPi_Pico_Common_THT; price est.
-U2,16-bit I2C ADC 4ch VSSOP-10,ADS1115IDGSR,Texas Instruments,1,1.50,1.50,Mouser 595-ADS1115IDGSR,I2C addr 0x48 (ADDR to GND)
-U3,EC analog frontend SPI SOIC-14,LMP91200SD/NOPB,Texas Instruments,1,3.50,0.00,Mouser 926-LMP91200SDNOPB,**DNP v1** — EOL/unavailable (May 2026); footprint retained for v2 AD5933 redesign
-U4,Op-amp FET-in rail-to-rail TSOT-23-5,AD8603ARTZ-R2,Analog Devices,1,1.20,1.20,Mouser 584-AD8603ARTZ-R2,pH unity-gain buffer; single supply 3.3V
-U5,LDO 3.3V 600mA SOT-23-5,AP2112K-3.3TRG1,Diodes Inc.,1,0.40,0.40,Mouser 621-AP2112K-3.3TRG1,Separate analog 3V3 rail
-D1,Dual series ESD diode SOT-23,BAV99,Nexperia,1,0.10,0.10,Mouser 771-BAV99215,pH input protection (GND / VCC clamp)
-D2,Signal diode SOD-123,1N4148W,Vishay,1,0.05,0.05,Mouser 78-1N4148W-E3-08,Relay 1 flyback
-D3,Signal diode SOD-123,1N4148W,Vishay,1,0.05,0.05,Mouser 78-1N4148W-E3-08,Relay 2 flyback
-Q1,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 1 driver
-Q3,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 2 driver
-K1,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,5V coil ≈80 mA from VSYS; 16 A 250 VAC; 5 kVAC reinforced coil-contact (required for 230 VAC next to SELV); price est.
-K2,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,Second on-board relay (minimum requirement); same part as K1
-J1,BNC female right-angle PCB mount 50 Ohm,1-1478035-0,TE Connectivity,1,2.50,2.50,Mouser / Distrelec,pH sensor connector; shell = shield = VREF_MID (not GND); KiCad footprint BNC_TEConnectivity_1478035_Horizontal; price est.
-J2-J6,Wago 3-pole push-in PCB terminal 3.5mm pitch (SELV sensors),2601-1103,Wago,5,0.90,4.50,Distrelec / Wago direct,Sensor ports W1-W5 (SELV side only); price est.
-J7 J10,Wago 3-pole CAGE CLAMP PCB terminal 5mm pitch 45°,236-403,Wago,2,1.20,2.40,Distrelec / Wago direct,Relay ports W6 = J7 (K1) + W7 = J10 (K2) in MAINS zone; 2.5 mm²; 24 A (IEC) / 300 V 15 A (UL); price est.
-J8,4-pin terminal block 3.5mm pitch,PT 1.5/4-3.5-H,Phoenix Contact,1,0.40,0.40,Mouser 651-1984617,EC sensor 4-wire connection
-R1,Resistor 10M 0603 1%,RC0603FR-0710ML,Yageo,1,0.05,0.05,Mouser 603-RC0603FR-0710ML,pH series input (BNC center → NODE_A); inside guard ring
-R2-R3,Resistor 100k 0603 1%,RC0603FR-07100KL,Yageo,2,0.02,0.04,Mouser 603-RC0603FR-07100KL,VREF divider (NODE_VREF); R4 intentionally unused
-R6 R7 R9 R17,Resistor 10k 0603 1%,RC0603FR-0710KL,Yageo,4,0.02,0.08,Mouser 603-RC0603FR-0710KL,R6 DHT22 pull-up; R7 NTC pull-up; R9 PIR out pull-up; R17 BSS84 gate pull-up
-R5 R10 R11,Resistor 4.7k 0603 1%,RC0603FR-074K7L,Yageo,3,0.02,0.06,Mouser 603-RC0603FR-074K7L,R5 1-Wire pull-up; R10/R11 I2C pull-ups
-R8 R18,Resistor 1k 0603 1%,RC0603FR-071KL,Yageo,2,0.02,0.04,Mouser 603-RC0603FR-071KL,"Relay base drive (R8 → Q1, R18 → Q3)"
-R15-R16,Resistor 10k 0603 1% (RC filter),RC0603FR-0710KL,Yageo,2,0.02,0.00,Mouser 603-RC0603FR-0710KL,**DNP v1** — EC PWM RC filter (GP13/GP14 to LMP91200)
-R19-R20,Resistor 100R 1206 1%,RC1206FR-07100RL,Yageo,2,0.05,0.10,Mouser 603-RC1206FR-07100RL,Relay contact snubber resistors (series with C19/C20); 1206 for mains (200 V working)
-C1-C2 C6-C12,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,9,0.05,0.45,Mouser 81-GRM188R71E104KA1D,C1 VREF; C2 AD8603; C6 NTC; C7 ADS1115; C8 LDO in; C9 VEML7700; C10 relay coils; C11 VSYS entry; C12 LDO out
-C3-C5,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,3,0.05,0.00,Mouser 81-GRM188R71E104KA1D,**DNP v1** — C3+C4 EC RC filter; C5 LMP91200 VDD decoupling
-C13-C16,Cap 10uF 0805 X5R 10V,GRM21BR61A106KE18L,Murata,4,0.10,0.40,Mouser 81-GRM21BR61A106KE8L,10 µF bulk: C13 VSYS entry; C14 LDO in; C15 LDO out; C16 ADS1115 VDD
-C17-C18,Cap 1uF 0603 X5R 10V,GRM188R61A105KA61D,Murata,2,0.08,0.16,Mouser 81-GRM188R61A105KA61D,AP2112K input (C17) / output (C18)
-C19-C20,Cap 100nF X2 film 275VAC THT,"X2 film 100nF 275VAC, 13x6 mm body, 10 mm pitch (e.g. WIMA MKX2)",Vishay / KEMET,2,0.40,0.80,Mouser,Relay contact EMC snubbers (series with R19/R20); X2 mandatory (230 VAC); DNP per channel for LED/contactor loads; footprint C_Rect_L13.0mm_W6.0mm_P10.00mm — verify body size of chosen part
-PCB,2-layer FR4 ENIG 100x80mm (qty 10),Custom,JLCPCB,1,1.50,1.50,jlcpcb.com,2-layer 1.6mm; order 10 minimum
-HDR1,2.54mm 1x4 debug header,PEC04SAAN,Sullins,1,0.20,0.20,Mouser 538-22-28-4040,UART0 TX RX + GND + 3V3
-U6,Ambient light sensor I2C 4-pin 6.8x2.35x3.0mm top view,VEML7700-TT,Vishay,1,0.80,0.80,Mouser 782-VEML7700-TT,I2C addr 0x10 (fixed). Footprint sensor_hub:VEML7700_TT (datasheet 84286 p.10)
-Q2,P-channel MOSFET SOT-23,BSS84PXUMA1,Infineon,1,0.10,0.10,Mouser 771-BSS84PXUMA1,PIR power gate (GP12); Vgs(th) -0.8 to -2.5V; Id -130mA; source→3V3_DIG drain→PIR VCC
-J9,2-pin screw terminal 5mm pitch,PT 1.5/2-5-H,Phoenix Contact,1,0.30,0.30,Mouser (verify SKU),VSYS + GND PCB-side input; connects to Bulgin PX0441 panel connector via short cable
-,,,,,,,,
-,,TOTAL,,,,31.08,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers
+ref,description,part_number,manufacturer,qty,unit_chf,ext_chf,distributor,notes,lcsc
+U1,Raspberry Pi Pico WH (pre-soldered headers),SC0919,Raspberry Pi,1,6.50,6.50,Distrelec / Mouser,Pico W with headers; plugs into U1 sockets; price est.,
+U1-SKT,Female header 1x20 2.54mm THT (socket for Pico WH),"generic 1x20 female, 8.5 mm",various,2,0.60,1.20,Distrelec / Mouser,Two sockets for U1 footprint RaspberryPi_Pico_Common_THT; price est.,
+U2,16-bit I2C ADC 4ch VSSOP-10,ADS1115IDGSR,Texas Instruments,1,1.50,1.50,Mouser 595-ADS1115IDGSR,I2C addr 0x48 (ADDR to GND),C37593
+U3,EC analog frontend SPI SOIC-14,LMP91200SD/NOPB,Texas Instruments,1,3.50,0.00,Mouser 926-LMP91200SDNOPB,**DNP v1** — EOL/unavailable (May 2026); footprint retained for v2 AD5933 redesign,
+U4,Op-amp FET-in rail-to-rail TSOT-23-5,AD8603AUJZ-REEL7,Analog Devices,1,1.20,1.20,LCSC / Mouser 584-AD8603AUJZ-REEL7,"pH unity-gain buffer; single supply 3.3V (order code AUJZ = TSOT-23-5; ""ARTZ"" does not exist)",C14937
+U5,LDO 3.3V 600mA SOT-23-5,AP2112K-3.3TRG1,Diodes Inc.,1,0.40,0.40,Mouser 621-AP2112K-3.3TRG1,Separate analog 3V3 rail,C51118
+D1,Dual series ESD diode SOT-23,BAV99,Nexperia,1,0.10,0.10,Mouser 771-BAV99215,pH input protection (GND / VCC clamp),C2500
+D2,Signal diode SOD-123,1N4148W,Vishay,1,0.05,0.05,Mouser 78-1N4148W-E3-08,Relay 1 flyback,C81598
+D3,Signal diode SOD-123,1N4148W,Vishay,1,0.05,0.05,Mouser 78-1N4148W-E3-08,Relay 2 flyback,C81598
+Q1,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 1 driver,C52801
+Q3,NPN BJT SOT-23,BC817-40,ON Semiconductor,1,0.10,0.10,Mouser 512-BC817-40LT1G,Relay 2 driver,C52801
+K1,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,5V coil ≈80 mA from VSYS; 16 A 250 VAC; 5 kVAC reinforced coil-contact (required for 230 VAC next to SELV); price est.,
+K2,SPDT relay 5V coil 16A PCB mount reinforced,G2RL-1-E DC5,Omron,1,2.50,2.50,Mouser 653-G2RL-1-E-DC5,Second on-board relay (minimum requirement); same part as K1,
+J1,BNC female right-angle PCB mount 50 Ohm,1-1478035-0,TE Connectivity,1,2.50,2.50,Mouser / Distrelec,pH sensor connector; shell = shield = VREF_MID (not GND); KiCad footprint BNC_TEConnectivity_1478035_Horizontal; price est.,
+J2-J6,Wago 3-pole push-in PCB terminal 3.5mm pitch (SELV sensors),2601-1103,Wago,5,0.90,4.50,Distrelec / Wago direct,Sensor ports W1-W5 (SELV side only); price est.,
+J7 J10,Wago 3-pole CAGE CLAMP PCB terminal 5mm pitch 45°,236-403,Wago,2,1.20,2.40,Distrelec / Wago direct,Relay ports W6 = J7 (K1) + W7 = J10 (K2) in MAINS zone; 2.5 mm²; 24 A (IEC) / 300 V 15 A (UL); price est.,
+J8,Wago 4-pole push-in PCB terminal 3.5mm pitch,2601-1104,Wago,1,1.10,1.10,Distrelec / Wago direct,EC sensor 4-wire connection; same 2601 family as J2-J6 (was Phoenix screw terminal); price est.,
+R1,Resistor 10M 0603 1%,RC0603FR-0710ML,Yageo,1,0.05,0.05,Mouser 603-RC0603FR-0710ML,pH series input (BNC center → NODE_A); inside guard ring,C7250
+R2-R3,Resistor 100k 0603 1%,RC0603FR-07100KL,Yageo,2,0.02,0.04,Mouser 603-RC0603FR-07100KL,VREF divider (NODE_VREF); R4 intentionally unused,C25803
+R6 R7 R9 R17,Resistor 10k 0603 1%,RC0603FR-0710KL,Yageo,4,0.02,0.08,Mouser 603-RC0603FR-0710KL,R6 DHT22 pull-up; R7 NTC pull-up; R9 PIR out pull-up; R17 BSS84 gate pull-up,C25804
+R5 R10 R11,Resistor 4.7k 0603 1%,RC0603FR-074K7L,Yageo,3,0.02,0.06,Mouser 603-RC0603FR-074K7L,R5 1-Wire pull-up; R10/R11 I2C pull-ups,C23162
+R8 R18,Resistor 1k 0603 1%,RC0603FR-071KL,Yageo,2,0.02,0.04,Mouser 603-RC0603FR-071KL,"Relay base drive (R8 → Q1, R18 → Q3)",C21190
+R15-R16,Resistor 10k 0603 1% (RC filter),RC0603FR-0710KL,Yageo,2,0.02,0.00,Mouser 603-RC0603FR-0710KL,**DNP v1** — EC PWM RC filter (GP13/GP14 to LMP91200),C25804 (DNP)
+R19-R20,Resistor 100R 1206 1%,RC1206FR-07100RL,Yageo,2,0.05,0.10,Mouser 603-RC1206FR-07100RL,Relay contact snubber resistors (series with C19/C20); 1206 for mains (200 V working),C17901
+C1-C2 C6-C12,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,9,0.05,0.45,Mouser 81-GRM188R71E104KA1D,C1 VREF; C2 AD8603; C6 NTC; C7 ADS1115; C8 LDO in; C9 VEML7700; C10 relay coils; C11 VSYS entry; C12 LDO out,C14663
+C3-C5,Cap 100nF 0603 X7R 25V,GRM188R71E104KA01D,Murata,3,0.05,0.00,Mouser 81-GRM188R71E104KA1D,**DNP v1** — C3+C4 EC RC filter; C5 LMP91200 VDD decoupling,C14663 (DNP)
+C13-C16,Cap 10uF 0805 X5R 10V (25V part fitted by JLC),GRM21BR61A106KE18L,Murata,4,0.10,0.40,Mouser 81-GRM21BR61A106KE8L,10 µF bulk: C13 VSYS entry; C14 LDO in; C15 LDO out; C16 ADS1115 VDD,C15850
+C17-C18,Cap 1uF 0603 X5R 10V,GRM188R61A105KA61D,Murata,2,0.08,0.16,Mouser 81-GRM188R61A105KA61D,AP2112K input (C17) / output (C18),C15849
+C19-C20,Cap 100nF X2 film 275VAC THT,"X2 film 100nF 275VAC, 13x6 mm body, 10 mm pitch (e.g. WIMA MKX2)",Vishay / KEMET,2,0.40,0.80,Mouser,Relay contact EMC snubbers (series with R19/R20); X2 mandatory (230 VAC); DNP per channel for LED/contactor loads; footprint C_Rect_L13.0mm_W6.0mm_P10.00mm — verify body size of chosen part,
+PCB,"2-layer FR4 ENIG 100x100mm, SMD assembly top side (qty 5)",Custom,JLCPCB,1,1.50,1.50,jlcpcb.com,"JLCPCB fab + SMD assembly: run tools/jlc_export.py, upload fab/gerbers.zip + bom_jlc.csv + cpl_jlc.csv",
+HDR1,2.54mm 1x4 debug header,PEC04SAAN,Sullins,1,0.20,0.20,Mouser 538-22-28-4040,UART0 TX RX + GND + 3V3,
+U6,Ambient light sensor I2C 4-pin 6.8x2.35x3.0mm top view,VEML7700-TT,Vishay,1,0.80,0.80,Mouser 782-VEML7700-TT,I2C addr 0x10 (fixed). Footprint sensor_hub:VEML7700_TT (datasheet 84286 p.10),C1850416
+Q2,P-channel MOSFET SOT-23,BSS84PXUMA1,Infineon,1,0.10,0.10,Mouser 771-BSS84PXUMA1,PIR power gate (GP12); Vgs(th) -0.8 to -2.5V; Id -130mA; source→3V3_DIG drain→PIR VCC,C152212
+J9,Wago 2-pole push-in PCB terminal 3.5mm pitch,2601-1102,Wago,1,0.70,0.70,Distrelec / Wago direct,VSYS + GND PCB-side input (was Phoenix screw terminal); connects to Bulgin PX0441 panel connector via short cable; price est.,
+,,,,,,,,,
+,,TOTAL,,,,31.08,,Excluding enclosure and cable glands; DNP items at 0.00; two 230 VAC relays + 7× Wago + X2 snubbers,

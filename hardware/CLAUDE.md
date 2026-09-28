@@ -25,9 +25,10 @@ An empty V1 skeleton also exists at `../PCB/V1 pico sensorhub/` (historical, ign
 - Drivers: GP10 → K1, GP15 → K2. Each has its own BC817 + 1N4148 flyback.
 
 ### Analog zone (bottom-left PCB quadrant)
-- Copper pour keepout on both layers under AD8603, the 10 MΩ input resistor (R1) and BAV99
+- No GND / GND_ANA pour under AD8603, the 10 MΩ input resistor (R1) and BAV99 — instead a guard pour `GUARD_PH` on both layers, net PH_BUF (AD8603 output), priority above GND_ANA
 - AD8603 is a plain unity-gain follower (IN– tied to OUT); no resistor from VREF to IN–
-- Route the high-impedance node (between 10 MΩ and AD8603 IN+) with a guard ring tied to AD8603 output — this eliminates PCB surface leakage that corrupts pH readings
+- Route the high-impedance node (between 10 MΩ and AD8603 IN+) inside that guard — it sits at ~ the node's own voltage, so surface leakage from nearby 3V3_ANA / GND_ANA copper ends on the guard instead of NODE_A (outdoor humidity: an unguarded 10 GΩ surface path to 3V3 would be ~1 pH of drift)
+- Top-side guard copper is exposed (F.Mask opening = guard fill shrunk 0.1 mm, minus footprint silkscreen): solder mask absorbs moisture and leaks, bare ENIG guard copper doesn't. NODE_A and all foreign copper stay masked. Keep the area flux-free after assembly (IPA clean)
 - Single-point AGND/DGND join at ADS1115 AGND pin
 - Separate 3V3_ANA pour fed by AP2112K LDO from VSYS (isolated from digital 3V3)
 - Reference designators: `docs/schematic.md` → "Reference Designators (master list)" is authoritative
@@ -67,4 +68,5 @@ The `kicad/` files are KiCad 10 format and are generated/maintained by the scrip
 - `wire_sch.py` — net labels / no-connects on every schematic pin (net table at the top). Idempotent.
 - `place_pcb.py` — outline, holes, isolation slots, rule areas, footprint placement. Idempotent; recreates all zones, leaves tracks alone, so rerun `autoroute.sh` afterwards.
 - `route_pcb.py` + `autoroute.sh` — hand-routed MAINS, NODE_A, 3V3_ANA at U2 and the J11 spare GPIOs, Freerouting for the rest (~1-15 min), dangling-via cleanup, GND / GND_ANA / guard pours. After only moving labels: `place_pcb.py`, then `route_pcb.py finish x x` to rebuild the pours. Java 25 + Freerouting 2.4.1 are cached in `~/.cache/sensor-hub-tools`.
+- `jlc_export.py` — JLCPCB order files in `fab/`: `gerbers.zip`, `bom_jlc.csv`, `cpl_jlc.csv`. JLCPCB assembles only the SMD parts (top side); all THT parts are hand-soldered. LCSC numbers live in the script (keyed by value + footprint) and in the `lcsc` column of `docs/bom.csv`; a new SMD part without an entry stops the export. Check part orientation in JLCPCB's placement preview before ordering (SOT-23, SOT-23-5, MSOP-10, SOD-123, VEML7700).
 - pcbnew (KiCad 10.0.6) Python quirks: iterate `b.Tracks()` / `b.Drawings()` by index (their iterators are broken) and test items with `GetClass()`, not `isinstance` (they come back as plain `BOARD_ITEM`); use `b.Delete()`, not `b.Remove()` (segfaults on filled boards); give a `SHAPE_POLY_SET` to `ZONE.SetOutline()` with `thisown = False`, otherwise saving segfaults and truncates the board file; do nothing but save after `ImportSpecctraSES` (it breaks the wrappers for the rest of the process).

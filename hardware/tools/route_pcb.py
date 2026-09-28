@@ -167,7 +167,7 @@ else:  # finish
     print("removed dangling vias/stubs:", removed)
 
     for z in zones():
-        if z.GetZoneName().startswith("TEMP_"): b.Delete(z)
+        if z.GetZoneName().startswith(("TEMP_", "GND", "GUARD")): b.Delete(z)   # rerunnable
     board = rectpts(0.3, 0.3, 99.7, 99.7)
     ana = rectpts(0.3, 11.0, 27.6, 77.5)          # analog column: LDO out, ADC, pH, NTC
     guard = rectpts(15.8, 45.0, 28.2, 51.2)       # around R1 / D1 / U4 (+ NODE_A)
@@ -177,5 +177,32 @@ else:  # finish
         poly_zone("GUARD_PH", "/PH_BUF", L, guard, 2, clearance=0.3)
     filler = pcbnew.ZONE_FILLER(b)
     filler.Fill(zones())
+
+    # Exposed guard on F.Cu (NODE_A side): solder mask absorbs moisture and leaks, bare
+    # (ENIG) guard copper does not. Opening = guard fill shrunk by 0.1 mm, so the mask
+    # still covers the clearance gaps, NODE_A and every foreign pad/track.
+    DR = b.Drawings()
+    for d in [DR[i] for i in range(len(DR))]:
+        if d.GetLayer() == pcbnew.F_Mask: b.Delete(d)
+    for z in zones():
+        if z.GetZoneName() == "GUARD_PH" and z.GetLayer() == pcbnew.F_Cu:
+            fill = pcbnew.SHAPE_POLY_SET(z.GetFilledPolysList(pcbnew.F_Cu))
+            fill.Deflate(MM(0.1), pcbnew.CORNER_STRATEGY_ROUND_ALL_CORNERS, MM(0.005))
+            silk = pcbnew.SHAPE_POLY_SET()                 # keep mask under footprint silkscreen
+            for f in b.GetFootprints():
+                GI = f.GraphicalItems()
+                texts = [t for t in (f.Reference(), f.Value()) if t.IsVisible()]
+                for g in [GI[i] for i in range(len(GI))] + texts:
+                    if g.GetLayer() == pcbnew.F_SilkS:
+                        g.TransformShapeToPolygon(silk, pcbnew.F_SilkS, MM(0.15), MM(0.005), pcbnew.ERROR_OUTSIDE)
+            fill.BooleanSubtract(silk)
+            fill.Simplify()
+            for i in range(fill.OutlineCount()):
+                one = pcbnew.SHAPE_POLY_SET(); one.AddOutline(fill.Outline(i))
+                for h in range(fill.HoleCount(i)): one.AddHole(fill.Hole(i, h))
+                one.thisown = False
+                s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_POLY); s.SetPolyShape(one)
+                s.SetFilled(True); s.SetWidth(0); s.SetLayer(pcbnew.F_Mask); b.Add(s)
+            print("guard mask openings:", fill.OutlineCount())
     b.Save(F)
     print("post done")
