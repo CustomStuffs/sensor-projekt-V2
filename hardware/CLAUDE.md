@@ -61,3 +61,10 @@ An empty V1 skeleton also exists at `../PCB/V1 pico sensorhub/` (historical, ign
 ## KiCad Note
 
 The `kicad/` skeleton files are in KiCad 10 format. Draw the schematic manually using `docs/schematic.md` as reference. Do not try to auto-generate KiCad XML — draw it in the KiCad application.
+
+## Scripts (`tools/`, run from the repo root)
+
+- `wire_sch.py` — net labels / no-connects on every schematic pin (net table at the top). Idempotent.
+- `place_pcb.py` — outline, holes, isolation slots, rule areas, footprint placement. Idempotent; resets tracks' surroundings, not tracks.
+- `route_pcb.py` + `autoroute.sh` — hand-routed MAINS + NODE_A, Freerouting for the rest, GND / GND_ANA / guard pours. Java 25 + Freerouting 2.4.1 are cached in `~/.cache/sensor-hub-tools`.
+- pcbnew (KiCad 10.0.6) Python quirks: iterate `b.Tracks()` / `b.Drawings()` by index (their iterators are broken); give a `SHAPE_POLY_SET` to `ZONE.SetOutline()` with `thisown = False`, otherwise saving segfaults and truncates the board file; do nothing but save after `ImportSpecctraSES` (it breaks the wrappers for the rest of the process).
