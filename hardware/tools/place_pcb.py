@@ -16,13 +16,13 @@ P = lambda x, y: pcbnew.VECTOR2I(MM(OX + x), MM(OY + y))
 # ── clean previous generated items (idempotent) ─────────────────────────────
 DR = b.Drawings()
 for d in [DR[i] for i in range(len(DR))]:
-    if d.GetLayer() in (pcbnew.Edge_Cuts,) or (d.GetLayer() == pcbnew.F_SilkS and isinstance(d, pcbnew.PCB_TEXT)):
-        b.Remove(d)
+    if d.GetLayer() in (pcbnew.Edge_Cuts,) or (d.GetLayer() == pcbnew.F_SilkS and d.GetClass() == "PCB_TEXT"):   # Drawings() yields plain BOARD_ITEMs
+        b.Delete(d)
 for z in list(b.Zones()):
-    b.Remove(z)
+    b.Delete(z)
 for f in list(b.GetFootprints()):
     if f.GetReference() in ("H1", "H2", "H3", "H4"):
-        b.Remove(f)
+        b.Delete(f)
 
 def rect(x0, y0, x1, y1, layer=pcbnew.Edge_Cuts, w=0.1):
     s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_RECT)
@@ -43,7 +43,7 @@ if "1478035" not in old.GetFPIDAsString():
     b.Add(new)
     for p in new.Pads():
         p.SetNet(nets.get(p.GetNumber()) or nets.get("2"))
-    b.Remove(old)
+    b.Delete(old)
 
 # ── mounting holes (M3, no copper) ─────────────────────────────────────────
 for i, (x, y) in enumerate([(3.5, 3.5), (3.5, 96.5), (96.5, 96.5), (96.5, 3.5)], 1):
@@ -138,14 +138,22 @@ def silk(t, x, y, size=1.2, rot=0):
     s.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size))); s.SetTextThickness(MM(size * 0.15))
     s.SetTextAngleDegrees(rot); b.Add(s)
 for t, x in (("W1 DS18B20", 29.8), ("W2 DHT22", 43.5), ("W3 PIR", 57.2), ("W4 GP16", 70.9), ("W5 GP17", 84.6)):
-    silk(t, x, 82.8, 1.0)
-silk("EC  W Y R B", 15, 89.8, 1.0)
-silk("W6 RELAY1", 92.5, 15.5, 1.0); silk("W7 RELAY2", 92.5, 51.5, 1.0)
+    silk(t, x, 86.3, 1.0)                        # inside the terminal outline, above the pins
+silk("EC  W Y R B", 15, 88.4, 1.0)                  # clear of the J8 reference
+silk("W6 RELAY1", 92.5, 13.9, 1.0); silk("W7 RELAY2", 92.5, 52.1, 1.0)
 for t_, y_ in (("NC", 19), ("COM", 24), ("NO", 29), ("NO", 37.3), ("COM", 42.3), ("NC", 47.3)):
-    silk(t_, 86.3, y_ - 2.1, 0.9)
+    silk(t_, 81.5, y_, 0.9)                      # on the (masked) mains track it names
 silk("! 230 VAC max 5 A", 73.5, 33.2, 1.2)
-silk("PH", 3, 43, 1.2); silk("5V IN", 14, 11.5, 1.0)
-silk("Sensor Hub V2.0  2026-09", 75, 70, 1.2)
+silk("PH", 3, 43, 1.2); silk("5V IN", 7.0, 11.0, 1.0)
+silk("Sensor Hub V2.0  2026-09", 80, 74, 1.2)
+
+# reference fields that would land on neighbours
+def ref_at(ref, x, y, rot, size=None):
+    r = FP(ref).Reference(); r.SetPosition(P(x, y)); r.SetTextAngleDegrees(rot)
+    if size: r.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size))); r.SetTextThickness(MM(size * 0.15))
+ref_at("C19", 57.25, 24.0, 90)                   # left of the cap, like C20
+ref_at("R19", 66.0, 20.9, 0, 0.8)                # no room beside R19 (C19 | K1 outline)
+ref_at("R20", 66.0, 47.1, 0, 0.8)
 
 b.Save(F)
 print("saved")

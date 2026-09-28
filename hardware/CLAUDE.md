@@ -60,11 +60,11 @@ An empty V1 skeleton also exists at `../PCB/V1 pico sensorhub/` (historical, ign
 
 ## KiCad Note
 
-The `kicad/` skeleton files are in KiCad 10 format. Draw the schematic manually using `docs/schematic.md` as reference. Do not try to auto-generate KiCad XML — draw it in the KiCad application.
+The `kicad/` files are KiCad 10 format and are generated/maintained by the scripts in `tools/` (see below), with `docs/schematic.md` as the source of truth for connections. Change the scripts and rerun them rather than hand-editing the generated parts; close the board in KiCad first, the scripts overwrite the file. Manual tweaks in the KiCad application are fine for anything the scripts don't own, but a rerun of `place_pcb.py` / `autoroute.sh` will reset placement, zones, labels and tracks.
 
 ## Scripts (`tools/`, run from the repo root)
 
 - `wire_sch.py` — net labels / no-connects on every schematic pin (net table at the top). Idempotent.
-- `place_pcb.py` — outline, holes, isolation slots, rule areas, footprint placement. Idempotent; resets tracks' surroundings, not tracks.
-- `route_pcb.py` + `autoroute.sh` — hand-routed MAINS + NODE_A, Freerouting for the rest, GND / GND_ANA / guard pours. Java 25 + Freerouting 2.4.1 are cached in `~/.cache/sensor-hub-tools`.
-- pcbnew (KiCad 10.0.6) Python quirks: iterate `b.Tracks()` / `b.Drawings()` by index (their iterators are broken); give a `SHAPE_POLY_SET` to `ZONE.SetOutline()` with `thisown = False`, otherwise saving segfaults and truncates the board file; do nothing but save after `ImportSpecctraSES` (it breaks the wrappers for the rest of the process).
+- `place_pcb.py` — outline, holes, isolation slots, rule areas, footprint placement. Idempotent; recreates all zones, leaves tracks alone, so rerun `autoroute.sh` afterwards.
+- `route_pcb.py` + `autoroute.sh` — hand-routed MAINS, NODE_A, 3V3_ANA at U2 and the J11 spare GPIOs, Freerouting for the rest (~1-15 min), dangling-via cleanup, GND / GND_ANA / guard pours. After only moving labels: `place_pcb.py`, then `route_pcb.py finish x x` to rebuild the pours. Java 25 + Freerouting 2.4.1 are cached in `~/.cache/sensor-hub-tools`.
+- pcbnew (KiCad 10.0.6) Python quirks: iterate `b.Tracks()` / `b.Drawings()` by index (their iterators are broken) and test items with `GetClass()`, not `isinstance` (they come back as plain `BOARD_ITEM`); use `b.Delete()`, not `b.Remove()` (segfaults on filled boards); give a `SHAPE_POLY_SET` to `ZONE.SetOutline()` with `thisown = False`, otherwise saving segfaults and truncates the board file; do nothing but save after `ImportSpecctraSES` (it breaks the wrappers for the rest of the process).
