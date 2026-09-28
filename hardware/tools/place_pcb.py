@@ -160,9 +160,12 @@ def silk(t, x, y, size=1.2, rot=0):
     s = pcbnew.PCB_TEXT(b); s.SetText(t); s.SetPosition(P(x, y)); s.SetLayer(pcbnew.F_SilkS)
     s.SetTextSize(pcbnew.VECTOR2I(MM(size), MM(size))); s.SetTextThickness(MM(size * 0.15))
     s.SetTextAngleDegrees(rot); b.Add(s)
-for t, x in (("W1 DS18B20", 30.4), ("W2 DHT22", 44.1), ("W3 PIR", 57.8), ("W4 GP16", 71.5), ("W5 GP17", 85.2)):
-    silk(t, x, 86.3, 1.0)                        # inside the terminal outline, above the pins
-silk("EC  W Y R B", 15.3, 86.3, 1.0)                # inside the J8 outline, like W1-W5
+# port labels above the terminals (the terminal bodies cover their own outline), with the
+# designator folded in; the separate reference fields are hidden so the two cannot collide
+for ref, t_, x in (("J8", "EC  W Y R B", 15.3), ("J2", "W1 DS18B20", 30.4), ("J3", "W2 DHT22", 44.1),
+                   ("J4", "W3 PIR", 57.8), ("J5", "W4 GP16", 71.5), ("J6", "W5 GP17", 85.2)):
+    silk("%s  %s" % (ref, t_), x, 82.8, 0.9)
+    FP(ref).Reference().SetVisible(False)
 silk("W6 RELAY1", 92.5, 13.9, 1.0); silk("W7 RELAY2", 92.5, 52.1, 1.0)
 for t_, y_ in (("NC", 19), ("COM", 24), ("NO", 29), ("NO", 37.3), ("COM", 42.3), ("NC", 47.3)):
     silk(t_, 81.5, y_, 0.9)                      # on the (masked) mains track it names
