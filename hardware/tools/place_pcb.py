@@ -51,6 +51,23 @@ swap("J1", "Connector_Coaxial", "BNC_TEConnectivity_1478035_Horizontal", "1-1478
 swap("J8", "TerminalBlock_WAGO", "TerminalBlock_WAGO_2601-1104_1x04_P3.50mm_Horizontal", "Wago-EC4pin")
 swap("J9", "TerminalBlock_WAGO", "TerminalBlock_WAGO_2601-1102_1x02_P3.50mm_Horizontal", "Wago-Power")
 
+# ── manufacturer 3D models (KiCad ships none for these). The STEP files are NOT in git
+# (vendor terms): download them into kicad/3d/, see kicad/3d/README.md. All vendor models
+# are Y-up; offsets put their pin 1 on the footprint's pad 1 (pins read from the STEP files).
+def model(ref, name, off, rot=(-90, 0, 90)):          # KiCad angles are clockwise-positive
+    m = pcbnew.FP_3DMODEL(); m.m_Filename = "${KIPRJMOD}/3d/" + name
+    m.m_Offset = pcbnew.VECTOR3D(*off); m.m_Rotation = pcbnew.VECTOR3D(*rot); m.m_Scale = pcbnew.VECTOR3D(1, 1, 1)
+    ms = FP(ref).Models(); ms.clear(); ms.push_back(m)
+model("J9", "Wago_2601-1102.step", (4.56, 0.08, 0))
+for r in ("J2", "J3", "J4", "J5", "J6"):
+    model(r, "Wago_2601-1103.step", (8.06, 0.08, 0))
+model("J8", "Wago_2601-1104.step", (11.56, 0.08, 0))
+for r in ("J7", "J10"):
+    model(r, "Wago_236-403.step", (13.1, 0, 0))
+for r in ("K1", "K2"):
+    model(r, "Omron_G2RL-14-E.step", (3.75, -12.2, 0))       # -14-E = sealed -1-E, same body/pins
+model("J1", "TE_BNC_1-1478035-0.step", (0, 16.9, 13.1), (-90, 0, 180))   # housing base at model y=-13.1
+
 # ── mounting holes (M3, no copper) ─────────────────────────────────────────
 for i, (x, y) in enumerate([(3.5, 3.5), (3.5, 96.5), (96.5, 96.5), (96.5, 3.5)], 1):
     h = pcbnew.FootprintLoad("/usr/share/kicad/footprints/MountingHole.pretty", "MountingHole_3.2mm_M3")
