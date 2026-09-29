@@ -54,7 +54,8 @@ server/
 
 - `devices` — one row per device_id, updated on each contact
 - `readings` — append-only, UNIQUE(device_id, ts) enforces idempotency
-- `commands` — pending/acked relay commands; acked_at=NULL means pending
+- `commands` — pending/acked relay commands; acked_at=NULL means pending; `relay` = 1 | 2 (on-board relay, default 1; added by the migration in `storage/database.py` for existing DBs)
+- `device_config.relay_schedule` — JSON list of schedule slots, each with an optional `relay` (1 | 2, validated by `ScheduleSlot`)
 
 Full schema: `storage/schema.sql`
 

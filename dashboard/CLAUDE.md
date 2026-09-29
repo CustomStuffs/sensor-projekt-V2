@@ -44,7 +44,8 @@ All base URLs are relative (same host, port 8080). Full shapes in root `CLAUDE.m
 
 ## Relay UI
 
-- Manual button: sends `POST /api/commands` with `action: "relay_on"` and a duration
+- Manual buttons: one ON/OFF row per relay (Relay 1 = W6, Relay 2 = W7) plus a shared duration; sends `POST /api/commands` with `action`, `duration_s` and `relay`
+- Schedule editor: each slot has a relay (column + selector); saved with `relay`, older slots without it show as relay 1
 - Status indicator: shows last known relay state (derived from most recent command)
 - Rule display: read-only view of `relay_rules` from latest device config (future feature)
 

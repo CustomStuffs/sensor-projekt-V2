@@ -40,29 +40,47 @@
     </section>
 
     <section id="relay-section">
-      <h2>Relay</h2>
+      <h2>Relays</h2>
 
       <div id="manual-override">
         <h3>Manual Override</h3>
         <div id="relay-controls">
-          <button id="btn-relay-on">ON</button>
-          <button id="btn-relay-off">OFF</button>
-          <input type="number" id="relay-duration" value="300" min="1" max="600" />
-          <label for="relay-duration">seconds</label>
+          <div class="relay-row">
+            <span class="relay-name">Relay 1 <small>W6</small></span>
+            <button class="btn-relay-on" data-relay="1">ON</button>
+            <button class="btn-relay-off" data-relay="1">OFF</button>
+          </div>
+          <div class="relay-row">
+            <span class="relay-name">Relay 2 <small>W7</small></span>
+            <button class="btn-relay-on" data-relay="2">ON</button>
+            <button class="btn-relay-off" data-relay="2">OFF</button>
+          </div>
+          <div class="relay-row">
+            <label for="relay-duration">ON for</label>
+            <input type="number" id="relay-duration" value="300" min="1" max="600" />
+            <span>seconds</span>
+          </div>
         </div>
+        <div id="relay-status"></div>
       </div>
 
       <div id="schedule-editor">
         <h3>Daily Schedule</h3>
         <table id="schedule-table">
           <thead>
-            <tr><th>Time</th><th>Duration</th><th>Days</th><th>Skip if</th><th></th></tr>
+            <tr><th>Relay</th><th>Time</th><th>Duration</th><th>Days</th><th>Skip if</th><th></th></tr>
           </thead>
           <tbody id="schedule-rows"></tbody>
         </table>
 
         <div id="add-slot-form">
           <div class="form-row">
+            <label>Relay
+              <select id="slot-relay">
+                <option value="1">1 (W6)</option>
+                <option value="2">2 (W7)</option>
+              </select>
+            </label>
             <label>Time <input type="time" id="slot-time" value="08:00" /></label>
             <label>Duration <input type="number" id="slot-duration" value="10" min="1" max="120" /> min</label>
           </div>

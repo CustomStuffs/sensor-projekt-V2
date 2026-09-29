@@ -31,7 +31,7 @@ All sensor fields are nullable — unconnected sensors send `null`.
 
 ## Relays (two on-board channels)
 
-The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15), rated 230 VAC / 5 A with reinforced insulation to the sensor side, as a hard minimum. Local sensor rules can drive either relay (`"relay": 2` in a rule); dashboard commands and schedules reach relay 1 until the server API carries a relay number. This allows two simultaneous actuator channels (e.g. pump + valve) without external modules. Future board variants can add more relays.
+The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15), rated 230 VAC / 5 A with reinforced insulation to the sensor side, as a hard minimum. Both relays can be switched and scheduled from the dashboard, and local sensor rules can target either one (`"relay": 2` in a rule; default is relay 1). This allows two simultaneous actuator channels (e.g. pump + valve) without external modules. Future board variants can add more relays.
 
 - **Auto rules**: threshold-based (e.g. water when soil < 30 %) configured in `firmware/src/config.json`
 - **Schedule**: time-based rules, also in `config.json`

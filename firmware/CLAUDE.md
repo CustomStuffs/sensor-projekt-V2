@@ -83,7 +83,7 @@ Full shapes: see root `CLAUDE.md`.
 - Commands, schedule slots and `relay_rules` entries take an optional `"relay": 1 | 2`; without it they drive relay 1, so existing configs, schedules and commands are unchanged.
 - Priority **per relay**: server command > schedule > sensor rules. A command for relay 1 does not stop relay 2's rules or schedule in the same cycle. One server command per cycle (acked on the next upload).
 - Example rule for relay 2 in `config.json`: `{ "sensor": "lux", "op": "<", "value": 100, "action": "relay_on", "duration_s": 600, "relay": 2 }`
-- **Server/dashboard do not pass `relay` yet** (the command table and `ScheduleSlot` have no such field), so remote control and schedules reach relay 1 only; relay 2 is driven by local `relay_rules` until the API is extended.
+- Server and dashboard send `relay` in commands and schedule slots (see root `CLAUDE.md` → API contract).
 - Tests: `python3 firmware/tests/test_relays.py` (desktop, no hardware).
 
 ## Power Budget
