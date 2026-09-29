@@ -6,7 +6,7 @@ Use this as the reference for KiCad entry. Every connection in `bom.csv` traces 
 
 **Also required:** Guard ring on the pH high-Z node + RC snubbers on both relay contact sets for EMC.
 
-**Connector decision:** Both relay contact sets use mains-rated Wago 3-pin connectors (W6 = Relay 1, W7 = Relay 2) at the bottom-right corner, inside the MAINS zone and separated from sensor ports W1–W5. No separate screw terminals next to the relays.
+**Connector decision:** Both relay contact sets use mains-rated Wago 3-pin connectors (W6 = Relay 1, W7 = Relay 2) at the right board edge next to the relays, inside the MAINS zone and separated from sensor ports W1–W5. No separate screw terminals next to the relays.
 
 **Mains decision (Sep 2026):** Relay contacts are rated for **230 VAC, 5 A per channel** (anything up to 48 V DC is covered too). Relays are Omron G2RL-1-E with reinforced coil–contact insulation. All relay contact nets belong to the `MAINS` netclass and need ≥ 8 mm creepage/clearance to every other net — see `pcb_guidelines.md` → Relay Zone Rules.
 
@@ -146,9 +146,11 @@ J8 Pin4 (NTC GND) ── GND_ANA
 | Channel | Signal | Sensor |
 |---------|--------|--------|
 | AIN0 | pH buffer output (AD8603 OUT) | pH electrode |
-| AIN1 | NTC divider (NODE_NTC) | EC sensor temperature |
-| AIN2 | Soil moisture analog out (Wago port 4 or 5) | Capacitive soil sensor |
-| AIN3 | Spare | — |
+| AIN1 | NTC divider (NODE_NTC) | NTC temperature probe on J8 |
+| AIN2 | not connected (no-connect in the schematic) | — |
+| AIN3 | not connected (no-connect in the schematic) | — |
+
+W4/W5 only carry the digital GP16/GP17. An analog sensor (e.g. capacitive soil moisture) goes to the Pico's own ADC on GP26–GP28, which are brought out on the J11 solder holes.
 
 ADS1115 I2C address: 0x48 (ADDR pin → GND_DIG)
 
@@ -167,9 +169,9 @@ Q1 COLLECTOR ─┬──── K1 coil (–)
               └──── D2(1N4148) cathode
 K1 coil (+) ──┴──── D2(1N4148) anode ──── VSYS
 
-K1 COM ─── W6 (Wago 6) pin 1
-K1 NO  ─── W6 (Wago 6) pin 2
-K1 NC  ─── W6 (Wago 6) pin 3
+K1 NO  ─── W6 (J7) pin 1
+K1 COM ─── W6 (J7) pin 2
+K1 NC  ─── W6 (J7) pin 3      (order follows the board: straight mains tracks)
 
 # Contact EMC snubber (across the switched path)
 K1 COM ── R19(100Ω) ── C19(100nF) ── K1 NO
@@ -184,9 +186,9 @@ Q3 COLLECTOR ─┬──── K2 coil (–)
               └──── D3(1N4148) cathode
 K2 coil (+) ──┴──── D3(1N4148) anode ──── VSYS
 
-K2 COM ─── W7 (Wago 7) pin 1
-K2 NO  ─── W7 (Wago 7) pin 2
-K2 NC  ─── W7 (Wago 7) pin 3
+K2 NC  ─── W7 (J10) pin 1
+K2 COM ─── W7 (J10) pin 2
+K2 NO  ─── W7 (J10) pin 3     (K2 is rotated 180°, so the order is mirrored)
 
 # Contact EMC snubber
 K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
@@ -207,14 +209,16 @@ K2 COM ── R20(100Ω) ── C20(100nF) ── K2 NO
 |------|-------|-------|-------|---------------------------|
 | W1 (J2) | 3V3_DIG | GND_DIG | GP8 (1-Wire) | DS18B20 temperature |
 | W2 (J3) | 3V3_DIG | GND_DIG | GP9 (DHT data) | DHT22 temp+humidity |
-| W3 (J4) | 3V3_DIG | GND_DIG | GP11 (PIR out) | PIR motion |
-| W4 (J5) | 3V3_DIG | GND_DIG | GP16 | Generic / soil moisture signal |
+| W3 (J4) | PIR_VCC (3V3 switched by Q2) | GND_DIG | GP11 (PIR out) | PIR motion |
+| W4 (J5) | 3V3_DIG | GND_DIG | GP16 | Generic digital (e.g. float switch) |
 | W5 (J6) | 3V3_DIG | GND_DIG | GP17 | Generic |
-| W6 (J7) | K1 COM | K1 NO | K1 NC | Relay 1 SPDT contacts — **MAINS, 230 VAC / 5 A** |
-| W7 (J10) | K2 COM | K2 NO | K2 NC | Relay 2 SPDT contacts — **MAINS, 230 VAC / 5 A** |
-| J8      | WE | RE | NTC+ | NTC– | EC 4-wire sensor |
+| W6 (J7) | K1 NO | K1 COM | K1 NC | Relay 1 SPDT contacts — **MAINS, 230 VAC / 5 A** |
+| W7 (J10) | K2 NC | K2 COM | K2 NO | Relay 2 SPDT contacts — **MAINS, 230 VAC / 5 A** |
 
-All actuator and sensor connections use push-in Wago terminals for a consistent interface. W1–W5 are SELV sensor ports (Wago 2601-1103, 3.5 mm); W6/W7 are mains-rated 3-pole THT terminals (Wago 236-403, 5 mm, 2.5 mm²) in the separate MAINS zone.
+- **J8** (4-pole, label `J8  EC W Y R B`): pin 1 and 2 not connected (were EC WE/RE), pin 3 NTC+ → NODE_NTC, pin 4 NTC– → GND_ANA.
+- **J9** (2-pole, label `5V IN`): pin 1 VSYS, pin 2 GND.
+
+All actuator and sensor connections use push-in Wago terminals for a consistent interface. W1–W5 are SELV sensor ports (Wago 2601-1103, 3.5 mm), J8/J9 are Wago 2601-1104/-1102 from the same push-in family; W6/W7 are mains-rated 3-pole THT terminals (Wago 236-403, 5 mm, 2.5 mm²) in the separate MAINS zone.
 
 **PIR power gate**: Q2 (BSS84, SOT-23 P-channel MOSFET) controlled by GP12 switches the 3V3 supply to the PIR on Wago port 3. This avoids the 50–65 mA PIR standby current during sleep.
 - Source → 3V3_DIG, Drain → PIR VCC (Wago port 3 pin 1), Gate → GP12

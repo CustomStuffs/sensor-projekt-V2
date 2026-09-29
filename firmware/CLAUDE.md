@@ -29,29 +29,27 @@ Confirm chip: the `INDEX.HTM` on the bootloader drive should redirect to `raspbe
 
 ## GPIO Pinout
 
+Source: `hardware/docs/schematic.md` (v1 board).
+
 | GPIO | Net | Connected to |
 |------|-----|-------------|
-| GP0 | UART_TX | Debug header |
-| GP1 | UART_RX | Debug header |
-| GP2 | I2C1_SDA | ADS1115 + BH1750 |
-| GP3 | I2C1_SCL | ADS1115 + BH1750 |
-| GP4 | SPI0_MISO | LMP91200 |
-| GP5 | SPI0_MOSI | LMP91200 |
-| GP6 | SPI0_SCK | LMP91200 |
-| GP7 | SPI0_CS | LMP91200 (active low) |
-| GP8 | 1-Wire | DS18B20 (Wago port 1) |
-| GP9 | DHT_DATA | DHT22 (Wago port 2) |
-| GP10 | RELAY_DRV | BC817 NPN base via 1 kΩ |
-| GP11 | PIR_IN | PIR output + wake IRQ (Wago port 3) |
-| GP12 | PIR_MOSFET | PIR power gate (saves 50–65 mA when off) |
-| GP13 | EC_PWM_A | EC excitation, 1–5 kHz |
-| GP14 | EC_PWM_B | EC excitation complement |
-| GP15 | (spare) | Was BH1750 ADDR; VEML7700 has no ADDR pin |
-| GP16 | WAGO4 | Generic (Wago port 4) |
-| GP17 | WAGO5 | Generic (Wago port 5) |
-| GP26 | ADC0 | Spare analog |
-| GP27 | ADC1 | Spare analog |
-| GP28 | ADC2 | Spare analog |
+| GP0 | UART0 TX | Debug header HDR1 pin 1 |
+| GP1 | UART0 RX | Debug header HDR1 pin 2 |
+| GP2 | I2C1 SDA | ADS1115 (0x48) + VEML7700 (0x10); 4.7 kΩ pull-up R10 |
+| GP3 | I2C1 SCL | ADS1115 + VEML7700; 4.7 kΩ pull-up R11 |
+| GP4–GP7 | free | J11 solder holes 1–4; reserved for a v2 EC front-end. Not connected to anything on the v1 board — the LMP91200 SPI code in firmware has no hardware |
+| GP8 | 1-Wire | DS18B20, Wago W1 (J2); 4.7 kΩ pull-up R5 |
+| GP9 | DHT_DATA | DHT22, Wago W2 (J3); 10 kΩ pull-up R6 |
+| GP10 | RELAY1_DRV | K1 via Q1 (BC817) + 1 kΩ R8 |
+| GP11 | PIR_OUT | PIR output + wake IRQ, Wago W3 (J4); 10 kΩ pull-up R9 |
+| GP12 | PIR_EN_N | PIR power gate Q2 (BSS84): LOW = PIR on; R17 pulls it off at boot |
+| GP13, GP14 | not connected | were the EC excitation PWM outputs; EC is not on the v1 board |
+| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 (not driven by the firmware yet) |
+| GP16 | W4_SIG | Wago W4 (J5), generic digital (e.g. float switch) |
+| GP17 | W5_SIG | Wago W5 (J6), generic digital |
+| GP18–GP22 | free | J11 solder holes 5–9 |
+| GP26–GP28 | free, ADC0–2 | J11 solder holes 10–12 (0–3.3 V analog, e.g. capacitive soil sensor on GP26) |
+| RUN | RUN | J11 hole 13 |
 
 **Pico W LED**: `Pin("LED", Pin.OUT)` — NOT `Pin(25)`.
 
@@ -95,7 +93,7 @@ Full shapes: see root `CLAUDE.md`.
 
 **pH** (2-point): use pH 4.0 and pH 7.0 buffer solutions. Record mV at each point. Update `ph_cal` in config.json.
 
-**EC**: use 1413 µS/cm standard solution. Set `ec_gain` in config.json to normalize reading.
+**EC** (needs an EC front-end — not on the v1 board, keep `ec` disabled): use 1413 µS/cm standard solution. Set `ec_gain` in config.json to normalize reading.
 
 **Soil moisture**: `dry_mv` = reading in dry air; `wet_mv` = reading in water. Update in config.json.
 

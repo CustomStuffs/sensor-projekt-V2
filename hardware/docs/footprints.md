@@ -15,7 +15,7 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 |-----|------|---------|--------------|-----------------|
 | U1 | Pico WH (SC0919) on sockets | 2× 1×20 THT, 2.54 mm | `MCU_Module:RaspberryPi_Pico_W` | `Module:RaspberryPi_Pico_Common_THT` |
 | U2 | ADS1115IDGSR | VSSOP-10 | `Analog_ADC:ADS1115IDGS` | `Package_SO:MSOP-10_3x3mm_P0.5mm` |
-| U4 | AD8603ARTZ-R2 | TSOT-23-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:TSOT-23-5` (KiCad symbol default) ⚠ |
+| U4 | AD8603AUJZ | TSOT-23-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:TSOT-23-5` |
 | U5 | AP2112K-3.3TRG1 | SOT-23-5 | `Regulator_Linear:AP2112K-3.3` | `Package_TO_SOT_SMD:SOT-23-5` |
 | U6 | VEML7700-TT | 4-pin, top view | `sensor_hub:VEML7700` (project) | `sensor_hub:VEML7700_TT` (project) |
 
@@ -68,3 +68,16 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 | J9 | Wago 2601-1102 | THT 2-pole push-in 3.5 mm | `TerminalBlock_WAGO:TerminalBlock_WAGO_2601-1102_1x02_P3.50mm_Horizontal` |
 | HDR1 | PEC04SAAN | 2.54 mm 1×4 | `Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical` |
 | J11 | — (DNP, holes only) | 2.54 mm 2×8 | `Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical` |
+
+---
+
+## Mechanical
+
+| Ref | Part | KiCad footprint | Notes |
+|-----|------|-----------------|-------|
+| H1–H4 | M3 board mounting | `MountingHole:MountingHole_3.2mm_M3` | corners, no copper |
+| H5–H7 | M2 light-pipe holder | `MountingHole:MountingHole_2.2mm_M2` | around U6 on r = 7 mm, no copper, reference hidden |
+
+## 3D models
+
+KiCad has no 3D models for the Wago terminals (2601-1102/-1103/-1104, 236-403), the G2RL relay (SPDT) and the TE BNC. `tools/place_pcb.py` points those footprints at vendor STEP files in `kicad/3d/` (with rotation/offset worked out from the pin positions in the STEP data). The STEP files are not in git (vendor terms, public repo) — download list in `kicad/3d/README.md`. U6 (VEML7700, project footprint) has no 3D model yet.

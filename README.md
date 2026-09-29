@@ -15,22 +15,23 @@ Remote access via Tailscale VPN — no port forwarding, no auth layer needed.
 
 ## Sensors
 
-| Sensor | Chip / interface | Measures |
-|--------|-----------------|----------|
-| Temperature | DS18B20, 1-Wire (GP8) | °C |
-| Humidity | DHT22, GP9 | % RH + °C fallback |
-| pH | ADS1115 ADC (I2C, GP2/3) | pH 0–14 |
-| EC | LMP91200, SPI (GP4–7) | µS/cm |
-| Light | BH1750 / VEML7700, I2C (GP2/3) | lux |
-| Soil moisture | Capacitive, ADC (GP26–28) | % |
-| Motion | PIR, GP11 (also wake IRQ) | boolean |
-| Water level | Float switch, GP16 | float |
+| Sensor | Chip / interface | Board connection | Measures |
+|--------|-----------------|------------------|----------|
+| Temperature | DS18B20, 1-Wire (GP8) | W1 (J2) | °C |
+| Humidity | DHT22, GP9 | W2 (J3) | % RH + °C fallback |
+| pH | AD8603 buffer → ADS1115 AIN0 (I2C, GP2/3) | BNC (J1), guarded input | pH 0–14 |
+| Light | VEML7700, I2C (GP2/3) | on the board, under a light pipe to the lid | lux |
+| Soil moisture | Capacitive, Pico ADC (GP26) | J11 solder holes (GP26–28) | % |
+| Motion | PIR, GP11 (also wake IRQ), power-gated by GP12 | W3 (J4) | boolean |
+| Water level | Float switch, GP16 | W4 (J5) | float |
+| Probe temperature | NTC → ADS1115 AIN1 | J8 pins 3/4 | °C (for compensation) |
+| EC | **not on the v1 board** (LMP91200 is EOL; firmware driver exists, keep `ec` disabled) | — | µS/cm |
 
 All sensor fields are nullable — unconnected sensors send `null`.
 
 ## Relays (two on-board channels)
 
-The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15) as a hard minimum. This allows two simultaneous actuator channels (e.g. pump + valve) without external modules. Future board variants can add more relays.
+The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15), rated 230 VAC / 5 A with reinforced insulation to the sensor side, as a hard minimum. (The firmware currently drives K1 only.) This allows two simultaneous actuator channels (e.g. pump + valve) without external modules. Future board variants can add more relays.
 
 - **Auto rules**: threshold-based (e.g. water when soil < 30 %) configured in `firmware/src/config.json`
 - **Schedule**: time-based rules, also in `config.json`
@@ -42,7 +43,7 @@ The PCB carries **two independent SPDT relays** (K1 on GP10, K2 on GP15) as a ha
 firmware/   MicroPython source + flash/dev tools
 server/     FastAPI app, SQLite schema, systemd unit
 dashboard/  Vanilla HTML/JS/CSS frontend
-hardware/   KiCad schematic + BOM
+hardware/   KiCad project + generation scripts, BOM, JLCPCB order files
 ```
 
 Each folder has its own `CLAUDE.md` with subproject-specific rules.
@@ -85,6 +86,10 @@ sudo systemctl enable --now sensor_hub
 ### Dashboard
 
 Served as static files by the FastAPI server — no build step. Open `http://<pi-ip>:8080` in a browser.
+
+### Hardware
+
+100 × 100 mm, 2-layer PCB (`hardware/kicad/`), generated and routed by the scripts in `hardware/tools/`. JLCPCB fabricates the board and places all SMD parts (`hardware/fab/`, regenerate with `python3 hardware/tools/jlc_export.py`); the through-hole parts — Pico WH sockets, relays, Wago push-in terminals, BNC, X2 capacitors, UART header — are hand-soldered. Details: `hardware/CLAUDE.md` and `hardware/docs/`.
 
 ## Pico W hardware notes
 

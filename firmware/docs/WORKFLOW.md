@@ -127,6 +127,8 @@ This runs `mpremote cp -r src/ :` then `mpremote reset`. After reset the device 
 
 ### EC (1-point calibration)
 
+> Needs an EC front-end, which the v1 board does not have (LMP91200 removed, EOL). Keep `sensors.ec.enabled = false` on v1 hardware.
+
 1. Use 1413 µS/cm standard solution at a known temperature (25 °C ideal).
 2. Edit `config.json` → `calibration.ec`:
 
@@ -179,18 +181,24 @@ To avoid this: always test new code changes in the REPL (`./tools/repl.sh`) befo
 
 ## GPIO Pinout Reference
 
+Source: `hardware/docs/schematic.md` (v1 board).
+
 | GPIO | Function | Notes |
 |------|----------|-------|
-| GP2  | I2C1 SDA | ADS1115, BH1750 |
-| GP3  | I2C1 SCL | ADS1115, BH1750 |
-| GP4  | SPI0 SCK | LMP91200 |
-| GP5  | SPI0 MOSI | LMP91200 |
-| GP6  | SPI0 MISO | LMP91200 |
-| GP7  | SPI0 CS | LMP91200 |
-| GP8  | 1-Wire | DS18B20 temperature |
-| GP9  | DHT22 data | Humidity sensor |
-| GP10 | Relay control | BC817 base via 1kΩ |
-| GP11 | PIR signal | HC-SR501 output |
-| GP12 | PIR power gate | MOSFET gate — powers PIR on/off |
-| GP13 | EC PWM A | Complementary excitation signal A |
-| GP14 | EC PWM B | Complementary excitation signal B (inverted) |
+| GP0 | UART0 TX | Debug header HDR1 pin 1 |
+| GP1 | UART0 RX | Debug header HDR1 pin 2 |
+| GP2 | I2C1 SDA | ADS1115 (0x48) + VEML7700 (0x10); 4.7 kΩ pull-up R10 |
+| GP3 | I2C1 SCL | ADS1115 + VEML7700; 4.7 kΩ pull-up R11 |
+| GP4–GP7 | free | J11 solder holes 1–4; reserved for a v2 EC front-end. Not connected to anything on the v1 board — the LMP91200 SPI code in firmware has no hardware |
+| GP8 | 1-Wire | DS18B20, Wago W1 (J2); 4.7 kΩ pull-up R5 |
+| GP9 | DHT_DATA | DHT22, Wago W2 (J3); 10 kΩ pull-up R6 |
+| GP10 | RELAY1_DRV | K1 via Q1 (BC817) + 1 kΩ R8 |
+| GP11 | PIR_OUT | PIR output + wake IRQ, Wago W3 (J4); 10 kΩ pull-up R9 |
+| GP12 | PIR_EN_N | PIR power gate Q2 (BSS84): LOW = PIR on; R17 pulls it off at boot |
+| GP13, GP14 | not connected | were the EC excitation PWM outputs; EC is not on the v1 board |
+| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 (not driven by the firmware yet) |
+| GP16 | W4_SIG | Wago W4 (J5), generic digital (e.g. float switch) |
+| GP17 | W5_SIG | Wago W5 (J6), generic digital |
+| GP18–GP22 | free | J11 solder holes 5–9 |
+| GP26–GP28 | free, ADC0–2 | J11 solder holes 10–12 (0–3.3 V analog, e.g. capacitive soil sensor on GP26) |
+| RUN | RUN | J11 hole 13 |

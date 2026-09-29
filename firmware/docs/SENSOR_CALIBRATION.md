@@ -53,8 +53,9 @@ This is a classic **2-point linear calibration** between pH 4 and pH 7.
 
 ## 2. EC / Conductivity Sensor
 
-**Hardware:** LMP91200 AFE + ADS1115 AIN3 (signal) + AIN1 (NTC temperature compensation).  
-Excitation via complementary PWM on GP13/GP14.
+> **Not available on the v1 board.** The LMP91200 front-end was removed (EOL); GP13/GP14 are unconnected and ADS1115 AIN3 is not wired. A v2 board with an AD5933 is planned. The procedure below applies once an EC front-end exists.
+
+**Hardware (as originally designed):** LMP91200 AFE + ADS1115 AIN3 (signal) + AIN1 (NTC temperature compensation), excitation via complementary PWM on GP13/GP14.
 
 **Current firmware model** (`sensors/ec.py`):
 ```python
@@ -93,7 +94,7 @@ Temperature compensation is already implemented at 2 %/°C relative to `ref_temp
 
 ## 3. Temperature Sensor
 
-**Hardware:** DS18B20 (1-Wire on GP8) + NTC on the EC board for local compensation.
+**Hardware:** DS18B20 (1-Wire on GP8, Wago W1) + NTC probe on J8 pins 3/4 (ADS1115 AIN1) for local compensation.
 
 ### Recommended procedure
 
