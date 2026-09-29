@@ -196,7 +196,7 @@ Source: `hardware/docs/schematic.md` (v1 board).
 | GP11 | PIR_OUT | PIR output + wake IRQ, Wago W3 (J4); 10 kΩ pull-up R9 |
 | GP12 | PIR_EN_N | PIR power gate Q2 (BSS84): LOW = PIR on; R17 pulls it off at boot |
 | GP13, GP14 | not connected | were the EC excitation PWM outputs; EC is not on the v1 board |
-| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 (not driven by the firmware yet) |
+| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 |
 | GP16 | W4_SIG | Wago W4 (J5), generic digital (e.g. float switch) |
 | GP17 | W5_SIG | Wago W5 (J6), generic digital |
 | GP18–GP22 | free | J11 solder holes 5–9 |

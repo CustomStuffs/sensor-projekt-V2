@@ -44,7 +44,7 @@ Source: `hardware/docs/schematic.md` (v1 board).
 | GP11 | PIR_OUT | PIR output + wake IRQ, Wago W3 (J4); 10 kΩ pull-up R9 |
 | GP12 | PIR_EN_N | PIR power gate Q2 (BSS84): LOW = PIR on; R17 pulls it off at boot |
 | GP13, GP14 | not connected | were the EC excitation PWM outputs; EC is not on the v1 board |
-| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 (not driven by the firmware yet) |
+| GP15 | RELAY2_DRV | K2 via Q3 (BC817) + 1 kΩ R18 |
 | GP16 | W4_SIG | Wago W4 (J5), generic digital (e.g. float switch) |
 | GP17 | W5_SIG | Wago W5 (J6), generic digital |
 | GP18–GP22 | free | J11 solder holes 5–9 |
@@ -64,7 +64,7 @@ src/
 ├── communication/       # WiFi, HTTP, time sync
 ├── storage/             # ringbuffer persisted to flash
 ├── power/               # lightsleep + wake IRQ
-└── automation/          # relay rule evaluation
+└── automation/          # relay rules + schedule (rules.py), per-relay control (control.py)
 ```
 
 ## API Contract (firmware side)
@@ -76,6 +76,15 @@ The Pico W calls these endpoints in order each cycle:
 4. `POST /api/commands/{id}/ack` → acknowledge executed commands
 
 Full shapes: see root `CLAUDE.md`.
+
+## Relays (K1 = relay 1 on GP10, K2 = relay 2 on GP15)
+
+- Both relays have the same safety timeout (`relay.max_on_duration_s`); `power.sleep()` wakes early for whichever relay's on-time ends first.
+- Commands, schedule slots and `relay_rules` entries take an optional `"relay": 1 | 2`; without it they drive relay 1, so existing configs, schedules and commands are unchanged.
+- Priority **per relay**: server command > schedule > sensor rules. A command for relay 1 does not stop relay 2's rules or schedule in the same cycle. One server command per cycle (acked on the next upload).
+- Example rule for relay 2 in `config.json`: `{ "sensor": "lux", "op": "<", "value": 100, "action": "relay_on", "duration_s": 600, "relay": 2 }`
+- **Server/dashboard do not pass `relay` yet** (the command table and `ScheduleSlot` have no such field), so remote control and schedules reach relay 1 only; relay 2 is driven by local `relay_rules` until the API is extended.
+- Tests: `python3 firmware/tests/test_relays.py` (desktop, no hardware).
 
 ## Power Budget
 

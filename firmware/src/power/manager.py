@@ -4,25 +4,24 @@ import machine
 import time
 
 
-def sleep(duration_s, relay=None, pir_pin_num=11):
+def sleep(duration_s, relays=(), pir_pin_num=11):
     """
-    Sleep for duration_s. If relay is active and expires sooner, wakes early
-    to turn it off then sleeps the remainder. Returns True if woken by PIR.
+    Sleep for duration_s. Wakes early whenever an active relay's on-time runs out,
+    switches it off, and sleeps the remainder. Returns True if woken by PIR.
     """
     pir = machine.Pin(pir_pin_num, machine.Pin.IN)
     pir.irq(trigger=machine.Pin.IRQ_RISING)
 
-    if relay is not None:
-        rem_ms = relay.remaining_ms()
-        if rem_ms is not None and rem_ms < duration_s * 1000:
-            _do_sleep(rem_ms)
-            relay.tick()
-            rest_ms = duration_s * 1000 - rem_ms
-            if rest_ms > 0:
-                _do_sleep(rest_ms)
-            return bool(pir.value())
-
-    _do_sleep(duration_s * 1000)
+    relays = list(relays)
+    left_ms = duration_s * 1000
+    while left_ms > 0:
+        due = [r.remaining_ms() for r in relays if r.remaining_ms() is not None]
+        step = min(due + [left_ms])
+        if step > 0:                       # never lightsleep(0): relay already due, just tick
+            _do_sleep(step)
+        left_ms -= step
+        for r in relays:
+            r.tick()
     return bool(pir.value())
 
 
