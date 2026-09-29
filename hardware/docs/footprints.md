@@ -15,14 +15,13 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 |-----|------|---------|--------------|-----------------|
 | U1 | Pico WH (SC0919) on sockets | 2× 1×20 THT, 2.54 mm | `MCU_Module:RaspberryPi_Pico_W` | `Module:RaspberryPi_Pico_Common_THT` |
 | U2 | ADS1115IDGSR | VSSOP-10 | `Analog_ADC:ADS1115IDGS` | `Package_SO:MSOP-10_3x3mm_P0.5mm` |
-| U3 ✗ | LMP91200SD/NOPB | ⚠ open | ⚠ none in KiCad 10 | `Package_SO:SOIC-14_3.9x8.7mm_P1.27mm` ⚠ |
 | U4 | AD8603ARTZ-R2 | TSOT-23-5 | `Amplifier_Operational:AD8603` | `Package_TO_SOT_SMD:TSOT-23-5` (KiCad symbol default) ⚠ |
 | U5 | AP2112K-3.3TRG1 | SOT-23-5 | `Regulator_Linear:AP2112K-3.3` | `Package_TO_SOT_SMD:SOT-23-5` |
 | U6 | VEML7700-TT | 4-pin, top view | `sensor_hub:VEML7700` (project) | `sensor_hub:VEML7700_TT` (project) |
 
 **U2 note**: DGS suffix = VSSOP-10 (3×3 mm, 0.5 mm pitch). KiCad 10 names this land pattern `MSOP-10_3x3mm_P0.5mm` (same footprint).
 
-**U3 note**: DNP in v1 and slated for replacement by AD5933. KiCad 10 has no LMP91200 symbol, and the package in the old docs (SOIC-14) is unconfirmed — decide whether to keep U3 on the v1 board at all before layout.
+**U3 / R15 / R16 / C3–C5**: EC front-end (LMP91200) removed from v1 (Sep 2026); designators retired.
 
 **U4 note**: TSOT-23-5 = order code AD8603AUJZ (JLCPCB/LCSC C14937, AD8603AUJZ-REEL7). The old BOM entry "AD8603ARTZ-R2" is not a valid ADI part number.
 
@@ -50,10 +49,8 @@ Project libraries live next to the project: `kicad/sensor_hub.kicad_sym` (symbol
 |-----|-------|---------|-----------------|
 | R1–R3, R5–R11, R17, R18 | various | 0603 | `Resistor_SMD:R_0603_1608Metric` |
 | R4 | — | — | intentionally unused |
-| R15–R16 ✗ | 10 kΩ DNP | 0603 | same — place footprint, do not populate |
 | R19–R20 | 100 Ω snubber | 1206 | `Resistor_SMD:R_1206_3216Metric` |
 | C1–C2, C6–C12 | 100 nF | 0603 | `Capacitor_SMD:C_0603_1608Metric` |
-| C3–C5 ✗ | 100 nF DNP | 0603 | same — place footprint, do not populate |
 | C13–C16 | 10 µF | 0805 | `Capacitor_SMD:C_0805_2012Metric` |
 | C17–C18 | 1 µF | 0603 | `Capacitor_SMD:C_0603_1608Metric` |
 | C19–C20 | 100 nF X2 film | THT box 13×6 mm, 10 mm pitch | `Capacitor_THT:C_Rect_L13.0mm_W6.0mm_P10.00mm_FKS3_FKP3_MKS4` ⚠ verify body size of chosen part |

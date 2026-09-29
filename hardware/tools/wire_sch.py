@@ -30,13 +30,11 @@ two("C2", "3V3_ANA", "GND_ANA")
 two("R2", "3V3_ANA", "VREF_MID")
 two("R3", "VREF_MID", "GND_ANA")
 two("C1", "VREF_MID", "GND_ANA")
-# NTC + EC (EC DNP)
+# NTC on J8 pins 3/4. EC front-end (LMP91200 U3 + R15/R16/C3/C4/C5) removed in v1:
+# LMP91200 is EOL, v2 plans an AD5933 which needs none of this. J8 pins 1/2 stay NC.
 c("J8", p1="NC", p2="NC", p3="NODE_NTC", p4="GND_ANA")
 two("R7", "3V3_ANA", "NODE_NTC")
 two("C6", "NODE_NTC", "GND_ANA")
-two("R15", "EC_PWM_A", "EC_EXC_A"); two("C3", "EC_EXC_A", "GND")
-two("R16", "EC_PWM_B", "EC_EXC_B"); two("C4", "EC_EXC_B", "GND")
-two("C5", "3V3_DIG", "GND")
 # ADC + light + I2C
 c("U2", p8="3V3_ANA", p3="GND_ANA", p1="GND_ANA", p2="NC", p4="PH_BUF", p5="NODE_NTC",
   p6="NC", p7="NC", p9="I2C_SDA", p10="I2C_SCL")
@@ -48,7 +46,7 @@ two("NT1", "GND_ANA", "GND")                         # single-point AGND/DGND jo
 # MCU
 gp = {0: "UART_TX", 1: "UART_RX", 2: "I2C_SDA", 3: "I2C_SCL", 4: "GP4", 5: "GP5",
       6: "GP6", 7: "GP7", 8: "ONEWIRE", 9: "DHT_DATA", 10: "RELAY1_DRV", 11: "PIR_OUT",
-      12: "PIR_EN_N", 13: "EC_PWM_A", 14: "EC_PWM_B", 15: "RELAY2_DRV", 16: "W4_SIG", 17: "W5_SIG"}
+      12: "PIR_EN_N", 15: "RELAY2_DRV", 16: "W4_SIG", 17: "W5_SIG"}
 PICO_GP_PIN = {0: 1, 1: 2, 2: 4, 3: 5, 4: 6, 5: 7, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14, 11: 15, 12: 16,
                13: 17, 14: 19, 15: 20, 16: 21, 17: 22, 18: 24, 19: 25, 20: 26, 21: 27, 22: 29,
                26: 31, 27: 32, 28: 34}
@@ -91,8 +89,7 @@ POS = {"J9": (35, 45), "C13": (48, 48), "C11": (56, 48), "C14": (66, 48), "C17":
        "#FLG01": (152, 40), "#FLG02": (165, 40),
        "J1": (35, 90), "R1": (50, 90), "D1": (80, 100), "U4": (110, 90), "C2": (130, 85),
        "R2": (45, 128), "R3": (58, 128), "C1": (71, 128),
-       "J8": (35, 175), "R7": (52, 175), "C6": (64, 175), "R15": (85, 175), "C3": (97, 175),
-       "R16": (109, 175), "C4": (121, 175), "U3": (115, 195), "C5": (135, 175),
+       "J8": (35, 175), "R7": (52, 175), "C6": (64, 175),
        "C16": (205, 50), "C7": (213, 50), "C9": (260, 50), "NT1": (190, 82), "R10": (220, 88), "R11": (230, 88),
        "J2": (35, 245), "R5": (50, 235), "J3": (75, 245), "R6": (90, 235), "J4": (115, 245),
        "R9": (130, 235), "Q2": (155, 225), "R17": (182, 212), "J5": (190, 245), "J6": (220, 245),
@@ -108,7 +105,8 @@ def move(b, x, y):
                   lambda m: '(at %s %s%s)' % (fmt(float(m.group(1)) + dx), fmt(float(m.group(2)) + dy), m.group(3) or ''), b)
 
 # Drop previous generated content (idempotency)
-s = SYM.sub(lambda m: "" if ref_of(m.group(0)) in ("NT1", "#FLG01", "#FLG02", "J11") else m.group(0), s)
+REMOVED = ("U3", "R15", "R16", "C3", "C4", "C5")          # EC front-end, dropped in v1
+s = SYM.sub(lambda m: "" if ref_of(m.group(0)) in ("NT1", "#FLG01", "#FLG02", "J11") + REMOVED else m.group(0), s)
 for kw in ("wire", "label", "no_connect", "junction"):
     s = re.sub(r'\n\t\(%s\b.*?\n\t\)(?=\n)' % kw, "", s, flags=re.S)
 

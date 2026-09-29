@@ -22,7 +22,7 @@ USB-C 5V (power bank)
 │                                         AP2112K IN ── AP2112K OUT (Analog 3V3) ─── ADS1115, AD8603, VREF divider, NTC pullup
 │
 └─ Pico W 3V3(OUT)
-     └─ Digital 3V3 ─── VEML7700, DS18B20, DHT22, PIR, LMP91200, pull-ups
+     └─ Digital 3V3 ─── VEML7700, DS18B20, DHT22, PIR, pull-ups
 
 (AP2112K is fed from VSYS, not from 3V3_DIG — a 3.3 V LDO cannot regulate from a 3.3 V input.)
 
@@ -30,8 +30,7 @@ I2C Bus (GP2/GP3, 4.7kΩ pullups to 3V3_DIG)
   ├── ADS1115  addr 0x48 (ADDR pin → GND)
   └── VEML7700 addr 0x10 (fixed; no ADDR pin)
 
-SPI Bus (GP4/GP5/GP6/GP7)
-  └── LMP91200 (EC analog frontend)
+SPI Bus (GP4/GP5/GP6/GP7): not used in v1 — reserved on J11 for the v2 EC front-end
 
 1-Wire (GP8, 4.7kΩ pullup to 3V3_DIG)
   └── DS18B20 temperature sensor (Wago port 1)
@@ -41,8 +40,7 @@ GPIO direct:
   GP10 ── Relay 1 driver (→ Q1 BC817 base)
   GP11 ── PIR output (Wago port 3, 10kΩ pullup, wake IRQ)
   GP12 ── PIR MOSFET gate (power gate for PIR)
-  GP13 ── EC excitation PWM A → RC filter → LMP91200
-  GP14 ── EC excitation PWM B (complement) → RC filter → LMP91200
+  GP13, GP14 ── unused in v1 (were the EC excitation PWM outputs; left unconnected)
   GP15 ── Relay 2 driver (→ Q3 BC817 base)
   GP16 ── Wago port 4 signal (generic)
   GP17 ── Wago port 5 signal (generic)
@@ -58,7 +56,7 @@ GPIO direct:
 | Net | Source | Destinations |
 |-----|--------|-------------|
 | VSYS | USB-C VBUS | Pico W VSYS, K1 coil (+), K2 coil (+), AP2112K VIN |
-| 3V3_DIG | Pico W 3V3(OUT) | VEML7700 VCC, DS18B20 VDD, DHT22 VDD, LMP91200 VDD, BC817 pull, I2C pullup tops |
+| 3V3_DIG | Pico W 3V3(OUT) | VEML7700 VCC, DS18B20 VDD, DHT22 VDD, BC817 pull, I2C pullup tops |
 | 3V3_ANA | AP2112K VOUT | ADS1115 VDD+AVDD, AD8603 VS+, VREF_TOP (pH divider), NTC pullup top |
 | GND_DIG | Pico W GND | All digital IC GND, Q1/Q3 emitters, K1/K2 coil (–) via collectors |
 | GND_ANA | ADS1115 AGND | AD8603 VS–, pH divider bottom, NTC low side |
@@ -113,23 +111,18 @@ This makes the potential difference between NODE_A and the surrounding copper al
 
 ---
 
-## EC Analog Frontend (LMP91200)
+## EC Measurement — not in v1
 
-> **DNP v1** — LMP91200 is EOL/unavailable (May 2026). U3 + R15 + R16 + C3 + C4 + C5
-> are all DNP. J8 pins 1–2 (WE/RE) are unconnected. J8 pins 3–4 (NTC) remain active.
-> Footprint retained; plan is AD5933 impedance converter for v2.
+> The LMP91200 EC front-end is EOL/unavailable (May 2026). In v1 it is **removed from the
+> schematic and the board**, together with its PWM RC filters and decoupling (U3, R15, R16,
+> C3, C4, C5; Sep 2026). GP13/GP14 are unused. v2 plans an AD5933 impedance converter
+> (own excitation, I2C/SPI); GP4–GP7 stay free on J11 for it. The designators U3, R15, R16,
+> C3, C4, C5 are retired, not reused.
 
 ```
-GP13 (PWM A) ── R15(10kΩ) ── C3(100nF) to GND ── LMP91200 excitation IN+
-GP14 (PWM B) ── R16(10kΩ) ── C4(100nF) to GND ── LMP91200 excitation IN–
-
-LMP91200 ── SPI ── Pico W (GP4 MISO, GP5 MOSI, GP6 SCK, GP7 CS)
-LMP91200 VDD ──── 3V3_DIG + C5(100nF) to GND_DIG
-LMP91200 GND ──── GND_DIG
-
-EC 4-wire terminal (J8, Phoenix Contact 4-pin):
-  Pin 1 (White) ── LMP91200 Working Electrode (WE)
-  Pin 2 (Yellow) ── LMP91200 Reference Electrode (RE)
+EC 4-wire terminal (J8, Wago 2601-1104 push-in):
+  Pin 1 (White) ── not connected in v1 (was EC Working Electrode)
+  Pin 2 (Yellow) ── not connected in v1 (was EC Reference Electrode)
   Pin 3 (Red)   ── NTC thermistor signal → NODE_NTC
   Pin 4 (Black) ── NTC GND → GND_ANA
 ```
@@ -240,7 +233,6 @@ All actuator and sensor connections use push-in Wago terminals for a consistent 
 | ADS1115 VDD | 10 µF + 100 nF | C16 + C7 | AVDD and VDD pins |
 | AD8603 VS+ | 100 nF | C2 | Within 0.5 mm of pin |
 | VEML7700 VDD | 100 nF | C9 | |
-| LMP91200 VDD | 100 nF | C5 (DNP) | |
 | VREF_MID | 100 nF to GND_ANA | C1 | Filters virtual mid-rail |
 | NTC node | 100 nF to GND_ANA | C6 | Anti-alias |
 | Relay coils (VSYS at K1/K2) | 100 nF | C10 | Local decoupling next to the coils |
@@ -257,15 +249,14 @@ Single source for every reference. KiCad schematic, `bom.csv` and `footprints.md
 |-----|-------|----------|
 | U1 | Pico WH | MCU module, plugged into 2× 1×20 female headers |
 | U2 | ADS1115IDGSR | 16-bit ADC, I2C 0x48 |
-| U3 | LMP91200 | EC front-end — **DNP v1** |
 | U4 | AD8603 | pH unity-gain buffer |
 | U5 | AP2112K-3.3 | 3V3_ANA LDO, input from VSYS |
-| U6 | VEML7700 | Ambient light, I2C 0x10 |
+| U6 | VEML7700 | Ambient light, I2C 0x10; under a light pipe, see pcb_guidelines.md |
 | J1 | BNC | pH probe input (shield → NODE_VREF) |
 | J2–J6 | Wago 3-pin | Sensor ports W1–W5 (SELV) |
 | J7 | Wago 3-pole mains | W6 = Relay 1 COM/NO/NC |
-| J8 | Phoenix 4-pin | EC probe (pins 3–4 NTC active in v1) |
-| J9 | Phoenix 2-pin | VSYS + GND input |
+| J8 | Wago 2601-1104 | EC/NTC probe (only pins 3–4 NTC used in v1) |
+| J9 | Wago 2601-1102 | VSYS + GND input |
 | J10 | Wago 3-pole mains | W7 = Relay 2 COM/NO/NC |
 | HDR1 | 1×4 header | Debug UART0 (GP0 TX, GP1 RX, GND, 3V3) |
 | J11 | 2×8 holes (DNP) | Spare-GPIO breakout: 1 GP4, 2 GP5, 3 GP6, 4 GP7, 5 GP18, 6 GP19, 7 GP20, 8 GP21, 9 GP22, 10 GP26, 11 GP27, 12 GP28, 13 RUN, 14 3V3_DIG, 15–16 GND |
@@ -284,8 +275,7 @@ Single source for every reference. KiCad schematic, `bom.csv` and `footprints.md
 | R8 | 1 kΩ | Q1 base (GP10) |
 | R9 | 10 kΩ | PIR output pull-up GP11 → 3V3_DIG |
 | R10, R11 | 4.7 kΩ | I2C pull-ups SDA/SCL → 3V3_DIG |
-| R15, R16 | 10 kΩ | EC PWM RC filter — **DNP v1** |
 | R17 | 10 kΩ | Q2 gate pull-up |
 | R18 | 1 kΩ | Q3 base (GP15) |
 | R19, R20 | 100 Ω 1206 | Relay 1 / Relay 2 snubber |
-| C1–C20 | see Decoupling Summary | C3, C4, C5 DNP v1 |
+| C1, C2, C6–C20 | see Decoupling Summary | C3, C4, C5 retired (EC front-end removed) |

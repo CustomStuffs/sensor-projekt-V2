@@ -31,7 +31,7 @@ Board: **100 × 100 mm** (was 100 × 80; enlarged Sep 2026 to fit the 8 mm MAINS
 │  │     │           │  │                             │ ║ │          │ │
 │  │  [BAV99]        │  │  [ADS1115]   [VEML7700]     │ ║ │ R19/C19  │ │
 │  │     │           │  │                             │ ║ │ R20/C20  │ │
-│  │  [AD8603]       │  │  [LMP91200]  [AP2112K]      │ ║ │          │ │
+│  │  [AD8603]       │  │              [AP2112K]      │ ║ │          │ │
 │  │     │           │  │                             │ ║ │          │ │
 │  │  [VREF divider] │  │  [Q1/Q3 + D2/D3 + K coils]──╫─╫─┤ (relay   │ │
 │  │                 │  │                             │ ║ │  bodies  │ │
@@ -79,9 +79,9 @@ The relay bodies straddle the SELV/MAINS boundary: coil pins on the SELV side, c
 
 8. **ADS1115**: place at the analog/digital boundary. AGND pad connects to GND_ANA; VDD connects to 3V3_ANA; SDA/SCL to GND_DIG. 100 nF decoupling within 0.5 mm of VDD pin.
 
-9. **LMP91200**: place near J8 (EC terminal). SPI traces (GP4–GP7) route as a bundle, away from analog zone. Keep SPI trace lengths within 10 mm of each other.
+9. **EC front-end**: removed in v1 (LMP91200 EOL); GP4–GP7 stay free on J11 for the v2 AD5933.
 
-10. **VEML7700**: near ADS1115 (shares I2C bus). Place 100 nF decoupling at VCC pin. No ADDR pin — I2C address fixed at 0x10.
+10. **VEML7700 (U6) + light pipe**: U6 sits in the digital area below J11 (centre x 45 / y 73.45 mm) so a light pipe (acrylic rod) can run straight up to a window in the lid. Three M2 holes (H5–H7, r = 7 mm, one above, two diagonally below U6) take a 3D-printed light-pipe holder; M2 screws from below into the print (or M2 heat-set inserts). Keep the holder area free of tall parts. C9 (100 nF) directly below U6, inside the hole triangle. I2C address fixed at 0x10.
 
 11. **I2C pullups**: place R10 and R11 (4.7 kΩ) close to Pico W GP2/GP3 pads, not at the sensor end.
 

@@ -137,6 +137,26 @@ elif stage == "post":
     import subprocess
     sys.exit(subprocess.call([sys.executable, __file__, "finish", DSN, SES, F]))
 
+elif stage == "fixclear":
+    # Freerouting rounds geometry and now and then lands a few µm under a clearance. Take
+    # those violations from a kicad-cli JSON DRC report (argv[2]) and make the offending
+    # tracks 0.01 mm narrower (never below 0.2 mm); the routing itself does not change.
+    import json, re
+    rep = json.load(open(DSN))
+    uuids = set()
+    for v in rep.get("violations", []):
+        m = re.search(r"clearance ([\d.]+) mm; actual ([\d.]+) mm", v.get("description", ""))
+        if v.get("type") != "clearance" or not m or float(m.group(1)) - float(m.group(2)) > 0.01:
+            continue
+        uuids |= {it["uuid"] for it in v.get("items", []) if it.get("description", "").startswith("Track")}
+    TR = b.Tracks(); n = 0
+    for t in [TR[i] for i in range(len(TR))]:
+        if t.m_Uuid.AsString() in uuids and t.GetWidth() >= MM(0.21):
+            t.SetWidth(t.GetWidth() - MM(0.01)); n += 1
+    if n:
+        pcbnew.ZONE_FILLER(b).Fill(zones()); b.Save(F)
+    print("fixclear: narrowed %d track(s)" % n)
+
 else:  # finish
     TR = b.Tracks()                                # before any zone access: that breaks TRACKS wrappers
     for t in [TR[i] for i in range(len(TR))]:

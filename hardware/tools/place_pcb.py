@@ -22,8 +22,11 @@ for d in [DR[i] for i in range(len(DR))]:
 for z in list(b.Zones()):
     b.Delete(z)
 for f in list(b.GetFootprints()):
-    if f.GetReference() in ("H1", "H2", "H3", "H4"):
+    # H1-H7 are recreated below; U3/R15/R16/C3/C4/C5 = EC front-end, removed from the v1 schematic
+    if f.GetReference() in ("H1", "H2", "H3", "H4", "H5", "H6", "H7", "U3", "R15", "R16", "C3", "C4", "C5"):
         b.Delete(f)
+for p in FP("U1").Pads():                          # GP13/GP14 were the EC PWM outputs, now unused
+    if p.GetNumber() in ("17", "19"): p.SetNetCode(0)
 
 def rect(x0, y0, x1, y1, layer=pcbnew.Edge_Cuts, w=0.1):
     s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_RECT)
@@ -74,6 +77,17 @@ for i, (x, y) in enumerate([(3.5, 3.5), (3.5, 96.5), (96.5, 96.5), (96.5, 3.5)],
     h.SetFPID(pcbnew.LIB_ID("MountingHole", "MountingHole_3.2mm_M3"))
     h.SetReference("H%d" % i); h.SetPosition(P(x, y)); h.SetBoardOnly(True); h.SetExcludedFromBOM(True); b.Add(h)
 
+# ── light pipe for U6: sensor centred at LP, three M2 holes (r = 7 mm, one up, two down)
+# for a 3D-printed light-pipe holder. The band between J11 (y 63.7) and the R5/R6/R9 row
+# (y 79.7) only fits M2, not M2.5.
+LP = (45.0, 73.45)
+import math
+for i, a in enumerate((90, 210, 330), 5):
+    x, y = LP[0] + 7 * math.cos(math.radians(a)), LP[1] - 7 * math.sin(math.radians(a))
+    h = pcbnew.FootprintLoad("/usr/share/kicad/footprints/MountingHole.pretty", "MountingHole_2.2mm_M2")
+    h.SetFPID(pcbnew.LIB_ID("MountingHole", "MountingHole_2.2mm_M2"))
+    h.SetReference("H%d" % i); h.SetPosition(P(x, y)); h.SetBoardOnly(True); h.SetExcludedFromBOM(True); h.Reference().SetVisible(False); b.Add(h)
+
 # ── placement helpers ──────────────────────────────────────────────────────
 def crt(f):
     c = f.GetCourtyard(pcbnew.F_CrtYd)
@@ -99,7 +113,7 @@ ctr("U5", 0, 12, 23)
 for ref, x in (("C15", 4), ("C18", 8), ("C12", 12)):
     ctr(ref, 90, x, 28.3)
 ctr("R10", 90, 23, 5); ctr("R11", 90, 26, 5)           # I2C pull-ups near Pico GP2/GP3
-ctr("U6", 0, 21.5, 24.5); ctr("C9", 0, 21.5, 28.5)       # light sensor
+ctr("U6", 0, *LP); ctr("C9", 0, LP[0], LP[1] + 3.2)      # light sensor under the light pipe
 # ADC
 ctr("U2", 0, 12, 34); ctr("C7", 90, 18.5, 34); ctr("C16", 90, 22.5, 34); ctr("NT1", 0, 12, 38.5)
 # pH FRONT-END (BNC at left edge, opening to -x)
@@ -107,8 +121,8 @@ bnc = FP("J1"); bnc.SetOrientationDegrees(90)
 bnc.SetPosition(P(7.6, 52))                             # housing front face on the board edge
 ctr("R1", 0, 19, 47); ctr("D1", 0, 19, 51.5); ctr("U4", 0, 24.5, 49); ctr("C2", 90, 25, 54)
 ctr("R2", 90, 17, 57); ctr("R3", 90, 20.5, 57); ctr("C1", 90, 24, 58.5)
-# NTC + EC (DNP) above J8
-for ref, x in (("R7", 9), ("C6", 12.5), ("R15", 16), ("C3", 19.5), ("R16", 23), ("C4", 26.5), ("C5", 30)):
+# NTC pull-up + filter above J8
+for ref, x in (("R7", 9), ("C6", 12.5)):
     ctr(ref, 90, x, 72)
 # MCU (USB end at top edge)
 u1 = FP("U1"); u1.SetOrientationDegrees(0); u1.SetPosition(P(31, 4))
@@ -181,6 +195,7 @@ ref_at("C19", 57.25, 24.0, 90)                   # left of the cap, like C20
 ref_at("R19", 66.0, 20.9, 0, 0.8)                # no room beside R19 (C19 | K1 outline)
 ref_at("R20", 66.0, 47.1, 0, 0.8)
 ref_at("J9", 19.8, 8.0, 90)                      # beside the (deep) Wago, not on the cap row below
+ref_at("C9", LP[0], LP[1] + 5.0, 0, 0.8)          # below C9, off the U6 pads
 
 b.Save(F)
 print("saved")

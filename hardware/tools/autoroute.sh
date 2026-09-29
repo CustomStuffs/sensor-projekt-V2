@@ -21,6 +21,8 @@ step pre
   -mp 30 -mt 4 --gui.enabled=false > "$W/freerouting.log" 2>&1
 grep -E "^  Net '" "$W/freerouting.log" || true
 step post
+kicad-cli pcb drc --format json --severity-error -o "$W/drc.json" hardware/kicad/sensor_hub.kicad_pcb >/dev/null 2>&1 || true
+python3 $T/route_pcb.py fixclear "$W/drc.json" x 2>&1 | grep -E "fixclear|Error|Trace" || true
 kicad-cli pcb drc --severity-error --severity-warning -o "$W/drc.rpt" hardware/kicad/sensor_hub.kicad_pcb >/dev/null 2>&1 || true
 grep -oE "^\[[a-z_]+\]" "$W/drc.rpt" | sort | uniq -c | sort -rn
 echo "logs + DRC report: $W"
