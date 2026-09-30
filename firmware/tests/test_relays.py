@@ -147,12 +147,25 @@ def test_sleep_wakes_for_each_relay():
     print("PASS  sleep_wakes_for_each_relay")
 
 
+def test_sleep_counts_early_wake():
+    # A PIR edge ends a lightsleep early: only the time actually slept is counted
+    calls = []
+    def do_sleep(ms):
+        calls.append(ms)
+        return 20_000 if len(calls) == 1 else ms
+    power._do_sleep = do_sleep
+    power.sleep(60, relays=[])
+    assert calls == [60_000, 40_000], calls
+    print("PASS  sleep_counts_early_wake")
+
+
 # ── Runner ────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     tests = [test_rules_per_relay, test_schedule_both_relays_fire, test_schedule_one_per_relay,
              test_command_targets_one_relay_only, test_legacy_command_and_unknown_relay,
-             test_schedule_beats_rules_per_relay, test_sleep_wakes_for_each_relay]
+             test_schedule_beats_rules_per_relay, test_sleep_wakes_for_each_relay,
+             test_sleep_counts_early_wake]
     failures = 0
     for t in tests:
         try:

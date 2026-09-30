@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS readings (
     soil_pct     REAL,
     motion       INTEGER,
     water_level  REAL,
+    probe_temp_c REAL,
     vbus_mv      INTEGER,
     UNIQUE(device_id, ts)
 );

@@ -56,7 +56,8 @@ Request: {
     "lux": 850,
     "soil_pct": 45,
     "motion": false,
-    "water_level": 0.0
+    "water_level": 0.0,
+    "probe_temp_c": 18.4
   }]
 }
 Response: { "ok": true, "stored": 1 }

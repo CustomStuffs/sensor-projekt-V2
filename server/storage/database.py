@@ -32,6 +32,7 @@ async def _migrate(conn: aiosqlite.Connection):
     migrations = [
         "ALTER TABLE readings ADD COLUMN water_level REAL",
         "ALTER TABLE commands ADD COLUMN relay INTEGER NOT NULL DEFAULT 1",   # two relays; old rows = relay 1
+        "ALTER TABLE readings ADD COLUMN probe_temp_c REAL",                  # NTC probe on J8
     ]
     for sql in migrations:
         try:

@@ -8,6 +8,7 @@ const SENSOR_META = {
   lux:          { label: "Light (lux)", color: "#9b59b6", yAxis: "y2" },
   soil_pct:     { label: "Soil (%)",    color: "#1abc9c", yAxis: "y" },
   water_level:  { label: "Water",       color: "#5dade2", yAxis: "y" },
+  probe_temp_c: { label: "Probe temp (°C)", color: "#c0392b", yAxis: "y" },
 };
 
 let chart = null;

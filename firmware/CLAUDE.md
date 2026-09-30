@@ -92,7 +92,7 @@ Full shapes: see root `CLAUDE.md`.
 |-------|---------|--------------------------|
 | Lightsleep | 0.30 mA | ~1745 s |
 | Sensing (all sensors) | 25 mA | ~25 s |
-| PIR warm-up | 65 mA | ~5 s |
+| PIR (powered while motion is enabled) | < 0.1 mA | continuous |
 | WiFi active | 80 mA | ~15 s |
 | **Average** | **~1.2 mA** | |
 
@@ -104,10 +104,13 @@ Full shapes: see root `CLAUDE.md`.
 
 **EC** (needs an EC front-end — not on the v1 board, keep `ec` disabled): use 1413 µS/cm standard solution. Set `ec_gain` in config.json to normalize reading.
 
-**Soil moisture**: `dry_mv` = reading in dry air; `wet_mv` = reading in water. Update in config.json.
+**Soil moisture**: `dry_count` = raw ADC count in dry air; `wet_count` = raw count in water. Update `calibration.soil` in config.json.
+
+**Probe temperature** (NTC on J8, ADS1115 AIN1): set `sensors.probe_temp.enabled`; `calibration.probe_temp` holds the NTC's R25 (`ntc_r0`) and B value (`ntc_b`) from its datasheet.
 
 ## Rules
 
 - No blocking delay longer than 2 s in the main loop
 - Every sensor read must return `None` on error, never raise
 - config.json is the only user-editable file — all tunables go here
+- Desktop tests (no hardware): `python3 firmware/tests/test_calibration.py`, `test_relays.py`, `test_motion.py`

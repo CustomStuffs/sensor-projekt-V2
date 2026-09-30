@@ -15,6 +15,7 @@ import sensors.humidity as hum_sensor
 import sensors.light as light_sensor
 import sensors.motion as motion_sensor
 import sensors.soil as soil_sensor
+import sensors.probe_temp as probe_temp_sensor
 import sensors.water_level as water_level_sensor
 from communication import wifi, time_sync, protocol
 from storage.ringbuffer import RingBuffer
@@ -34,10 +35,11 @@ def init_hardware(cfg):
     s = cfg["sensors"]
     ads = lmp = pwm_a = pwm_b = i2c = None
 
-    needs_i2c = s.get("ph", {}).get("enabled") or s.get("light", {}).get("enabled")
+    needs_ads = s.get("ph", {}).get("enabled") or s.get("probe_temp", {}).get("enabled")
+    needs_i2c = needs_ads or s.get("light", {}).get("enabled")
     if needs_i2c:
         i2c = I2C(1, sda=Pin(2), scl=Pin(3), freq=400_000)
-        if s.get("ph", {}).get("enabled"):
+        if needs_ads:
             ads = ADS1115(i2c)
 
     if s.get("ec", {}).get("enabled"):
@@ -47,6 +49,9 @@ def init_hardware(cfg):
         lmp = LMP91200(spi, cs)
         pwm_a = PWM(Pin(13), freq=2000, duty_u16=0)
         pwm_b = PWM(Pin(14), freq=2000, duty_u16=0)
+
+    if s.get("motion", {}).get("enabled"):
+        motion_sensor.start(warmup_s=s["motion"].get("warmup_s", 60))
 
     max_on_s = cfg["relay"]["max_on_duration_s"]
     relays = {n: Relay(pin_num=pin, max_on_s=max_on_s) for n, pin in RELAY_PINS.items()}
@@ -80,8 +85,11 @@ def read_all_sensors(cfg, ads, lmp, pwm_a, pwm_b, i2c):
         reading["soil_pct"] = soil_sensor.read(s["soil"], cal["soil"])
 
     if s["motion"]["enabled"]:
-        detected = motion_sensor.read(scan_duration_s=s["motion"]["scan_duration_s"])
-        reading["motion"] = detected
+        reading["motion"] = motion_sensor.read()
+
+    if s.get("probe_temp", {}).get("enabled"):
+        reading["probe_temp_c"] = probe_temp_sensor.read(
+            ads, cal["probe_temp"], channel=s["probe_temp"].get("ads_channel", 1))
 
     if s.get("water_level", {}).get("enabled"):
         reading["water_level"] = water_level_sensor.read(s["water_level"])

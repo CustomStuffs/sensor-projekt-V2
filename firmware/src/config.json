@@ -24,8 +24,9 @@
     "humidity":    { "enabled": true },
     "light":       { "enabled": false },
     "soil":        { "enabled": true,  "adc_pin": 26 },
-    "motion":      { "enabled": false, "scan_duration_s": 5 },
-    "water_level": { "enabled": true,  "pin": 16 }
+    "motion":      { "enabled": false, "warmup_s": 60 },
+    "water_level": { "enabled": true,  "pin": 16 },
+    "probe_temp":  { "enabled": false, "ads_channel": 1 }
   },
 
   "calibration": {
@@ -41,6 +42,10 @@
     "soil": {
       "dry_count": 65535,
       "wet_count": 9600
+    },
+    "probe_temp": {
+      "ntc_r0": 10000,
+      "ntc_b": 3950
     }
   },
 
