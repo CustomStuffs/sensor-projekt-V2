@@ -2,6 +2,7 @@ import json
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
+from api.models import RelayNo
 from storage.database import get_db
 
 router = APIRouter()
@@ -18,6 +19,7 @@ class ScheduleSlot(BaseModel):
     duration_s: int
     days: list[str]
     skip_if: Optional[ScheduleCondition] = None
+    relay: RelayNo = 1
 
 
 class ScheduleSaveRequest(BaseModel):

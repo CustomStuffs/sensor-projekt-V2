@@ -389,20 +389,26 @@ API contract changes.</p>
 <h2><span class="section-num">4</span> Hardware — the circuit board</h2>
 
 <p>
-  A custom PCB (circuit board) connects all the sensors and the relay to the Pico W's GPIO
-  pins. Designed in <strong>KiCad</strong> (free, open-source PCB design tool). Sensors
-  plug in via <strong>Wago lever connectors</strong> — no soldering required to swap a sensor.
+  A custom 100 × 100 mm PCB (circuit board) connects all the sensors and two relays to the
+  Pico W's GPIO pins. Designed in <strong>KiCad</strong> (free, open-source PCB design tool),
+  with scripts in <code>hardware/tools/</code> doing the placement, routing and order files.
+  Every wire plugs into a <strong>Wago push-in connector</strong> — no screw terminals, no
+  soldering required to swap a sensor. The relays can switch 230 V mains, so the board is
+  split into a safe low-voltage side and a separated mains zone. JLCPCB solders the small
+  surface-mount parts; the larger through-hole parts are soldered by hand.
 </p>
 
 <h3>Key GPIO pin assignments</h3>
 <table>
   <tr><th>GPIO pin</th><th>What's connected</th></tr>
-  <tr><td>GP2 / GP3</td><td>I2C bus — light sensor, pH chip</td></tr>
+  <tr><td>GP2 / GP3</td><td>I2C bus — VEML7700 light sensor (under a light pipe), ADS1115 ADC for pH</td></tr>
   <tr><td>GP8</td><td>DS18B20 digital temperature probe (1-Wire)</td></tr>
   <tr><td>GP9</td><td>DHT22 humidity + temperature sensor</td></tr>
-  <tr><td>GP10</td><td>Relay — drives the water pump</td></tr>
+  <tr><td>GP10</td><td>Relay 1 — e.g. the water pump</td></tr>
   <tr><td>GP11</td><td>PIR motion sensor (also wake-up interrupt)</td></tr>
-  <tr><td>GP26</td><td>Soil moisture sensor (analog voltage)</td></tr>
+  <tr><td>GP15</td><td>Relay 2 — second actuator (valve, light, …)</td></tr>
+  <tr><td>GP16 / GP17</td><td>Two generic Wago ports (e.g. float switch for water level)</td></tr>
+  <tr><td>GP26</td><td>Soil moisture sensor (analog voltage, via the spare-GPIO holes J11)</td></tr>
 </table>
 
 <!-- ─────────────────────────── END TO END ─────────────────────────── -->

@@ -1,4 +1,4 @@
-"""Resistive soil moisture sensor on a Pico ADC pin (default GP26)."""
+"""Capacitive soil moisture sensor (v2.0, TLC555, powered from 3.3 V) on a Pico ADC pin (default GP26, J11 hole 10)."""
 
 from machine import ADC
 
@@ -8,7 +8,7 @@ def read(cfg, cal):
     Return soil moisture as percentage (0-100) or None on error.
     cfg = sensors.soil block from config.json  (needs "adc_pin")
     cal = calibration.soil block               (needs "dry_count", "wet_count")
-    Higher raw count = drier (high resistance = high voltage at ADC pin).
+    Higher raw count = drier (the sensor's output voltage rises as the soil dries).
     """
     try:
         raw = ADC(cfg.get("adc_pin", 26)).read_u16()

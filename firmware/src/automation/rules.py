@@ -1,4 +1,8 @@
-"""Relay rule evaluation: sensor threshold rules and time-based daily schedule."""
+"""Relay rule evaluation: sensor threshold rules and time-based daily schedule.
+
+Rules and schedule slots may carry "relay": 1 | 2 (which on-board relay they drive);
+without it they apply to relay 1, so older configs and schedules keep working.
+"""
 
 import time
 
@@ -16,13 +20,19 @@ _DAY_MAP = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6
 _last_fired = {}
 
 
-def evaluate(rules, reading):
+def relay_of(item):
+    """Relay number an action/rule/slot targets (default 1)."""
+    return item.get("relay", 1)
+
+
+def evaluate(rules, reading, relay=1):
     """
-    Check sensor threshold rules against the latest reading dict.
+    Check the sensor threshold rules for one relay against the latest reading dict.
     Returns the first matching rule dict or None.
-    Rule shape: { "sensor", "op", "value", "action", "duration_s" }
+    Rule shape: { "sensor", "op", "value", "action", "duration_s", "relay"? }
     relay_off rules are checked before relay_on so an upper bound always wins.
     """
+    rules = [r for r in rules if relay_of(r) == relay]
     off_rules = [r for r in rules if r.get("action") == "relay_off"]
     on_rules  = [r for r in rules if r.get("action") != "relay_off"]
 
@@ -40,15 +50,22 @@ def evaluate_schedule(schedule, reading, current_ts):
     """
     Check each time-based schedule entry against the current time.
     Fires on the first cycle after the scheduled time (within a 29-minute window).
-    Returns {"action": "relay_on", "duration_s": N} or None.
+    Returns a list of {"relay": n, "action": "relay_on", "duration_s": N}, at most one per
+    relay (the first due slot wins; a later one for the same relay stays due next cycle).
 
-    Slot shape: { "time": "HH:MM", "duration_s": int, "days": [...], "skip_if": {sensor, op, value} | null }
+    Slot shape: { "time": "HH:MM", "duration_s": int, "days": [...], "skip_if": {sensor, op, value} | null,
+                  "relay": 1 | 2 (optional, default 1) }
     """
+    fired = {}
     lt = time.localtime(current_ts)
     current_min = lt[3] * 60 + lt[4]
     weekday = lt[6]
 
     for i, slot in enumerate(schedule):
+        relay = relay_of(slot)
+        if relay in fired:
+            continue
+
         # Day-of-week check
         allowed_days = [_DAY_MAP[d] for d in slot.get("days", list(_DAY_MAP.keys()))]
         if weekday not in allowed_days:
@@ -75,6 +92,6 @@ def evaluate_schedule(schedule, reading, current_ts):
                 continue
 
         _last_fired[i] = current_ts
-        return {"action": "relay_on", "duration_s": slot["duration_s"]}
+        fired[relay] = {"relay": relay, "action": "relay_on", "duration_s": slot["duration_s"]}
 
-    return None
+    return list(fired.values())

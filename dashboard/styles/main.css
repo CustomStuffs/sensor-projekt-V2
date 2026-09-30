@@ -72,7 +72,12 @@ main { padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
 
 #relay-section h2 { margin-bottom: 0.75rem; }
 
-#relay-controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+#relay-controls { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.relay-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+.relay-name { min-width: 6.5rem; font-weight: 600; }
+.relay-name small { color: #888; font-weight: 400; margin-left: 0.25rem; }
 
 #relay-controls button {
   padding: 0.4rem 1rem;
@@ -82,8 +87,8 @@ main { padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
   font-weight: 600;
 }
 
-#btn-relay-on  { background: #2ecc71; color: #000; }
-#btn-relay-off { background: #e74c3c; color: #fff; }
+.btn-relay-on  { background: #2ecc71; color: #000; }
+.btn-relay-off { background: #e74c3c; color: #fff; }
 
 #relay-duration { width: 5rem; padding: 0.3rem 0.5rem; background: #2a2d3a; color: #e0e0e0; border: 1px solid #3a3d4a; border-radius: 4px; }
 

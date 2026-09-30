@@ -13,8 +13,15 @@ import types
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+class _FakeADC:
+    """machine.ADC stand-in: every pin returns _FakeADC.count."""
+    count = 0
+    def __init__(self, pin): pass
+    def read_u16(self): return _FakeADC.count
+
 _machine = types.ModuleType("machine")
 _machine.Pin = object
+_machine.ADC = _FakeADC
 sys.modules.setdefault("machine", _machine)
 
 _micropython = types.ModuleType("micropython")
@@ -30,6 +37,8 @@ if not hasattr(_time, "sleep_ms"):
 import sensors.ph as ph_sensor
 import sensors.ec as ec_sensor
 import sensors.soil as soil_sensor
+import sensors.probe_temp as probe_temp_sensor
+import sensors.light as light_sensor
 
 # ── Mock hardware objects ─────────────────────────────────────────────────────
 
@@ -41,7 +50,8 @@ class MockADS:
         self._v = voltages or {}
         self._r = raw_counts or {}
 
-    def read_voltage(self, channel):
+    def read_voltage(self, channel, fsr=2.048):
+        self.last_fsr = fsr
         return self._v.get(channel, 0.0)
 
     def read_raw(self, channel):
@@ -113,22 +123,49 @@ def test_ec_temp_compensation():
 
 def test_soil_calibration():
     cal = {"dry_count": 26000, "wet_count": 13000}
+    cfg = {"adc_pin": 26}
 
-    assert soil_sensor.read(MockADS(raw_counts={2: 26000}), cal) == 0.0,   "dry = 0 %"
-    assert soil_sensor.read(MockADS(raw_counts={2: 13000}), cal) == 100.0, "wet = 100 %"
+    def soil(count):
+        _FakeADC.count = count
+        return soil_sensor.read(cfg, cal)
 
-    mid = (26000 + 13000) // 2
-    assert abs(soil_sensor.read(MockADS(raw_counts={2: mid}), cal) - 50.0) < 0.1, \
-        "midpoint ~50 %"
+    assert soil(26000) == 0.0,   "dry = 0 %"
+    assert soil(13000) == 100.0, "wet = 100 %"
+    assert abs(soil((26000 + 13000) // 2) - 50.0) < 0.1, "midpoint ~50 %"
+    assert soil(30000) == 0.0,   "over-range → 0 %"
+    assert soil(5000) == 100.0,  "under-range → 100 %"
 
-    assert soil_sensor.read(MockADS(raw_counts={2: 30000}), cal) == 0.0,  "over-range → 0 %"
-    assert soil_sensor.read(MockADS(raw_counts={2: 5000}),  cal) == 100.0, "under-range → 100 %"
-
-    bad_cal = {"dry_count": 20000, "wet_count": 20000}
-    assert soil_sensor.read(MockADS(raw_counts={2: 20000}), bad_cal) is None, \
+    _FakeADC.count = 20000
+    assert soil_sensor.read(cfg, {"dry_count": 20000, "wet_count": 20000}) is None, \
         "degenerate cal → None"
 
     print("PASS  test_soil_calibration")
+
+
+def test_probe_temp():
+    cal = {"ntc_r0": 10000, "ntc_b": 3950}
+
+    # 25 °C: NTC = pull-up = 10 k → node at half of 3.3 V
+    ads = MockADS(voltages={1: 1.65})
+    assert probe_temp_sensor.read(ads, cal) == 25.0
+    assert ads.last_fsr == 4.096, "NTC must be read on the ±4.096 V range"
+
+    # 5 °C: NTC ≈ 25.3 k → node ≈ 2.37 V, above the old ±2.048 V range
+    r5 = 10000 * math.exp(3950 * (1 / 278.15 - 1 / 298.15))
+    v5 = 3.3 * r5 / (r5 + 10000)
+    assert v5 > 2.048
+    assert abs(probe_temp_sensor.read(MockADS(voltages={1: v5}), cal) - 5.0) < 0.1
+
+    assert probe_temp_sensor.read(MockADS(voltages={1: 3.3}), cal) is None, "open probe → None"
+    assert probe_temp_sensor.read(MockADS(voltages={1: 0.0}), cal) is None, "short → None"
+    print("PASS  test_probe_temp")
+
+
+def test_light_scaling():
+    assert abs(light_sensor._LUX_COEFF - 2.1504) < 1e-9, "gain 1/8, IT 25 ms = 2.1504 lux/count"
+    assert abs(light_sensor._correct(100) - 100.2) < 1, "correction ~1:1 at low lux"
+    assert light_sensor._correct(50000) > 50000, "correction raises high readings"
+    print("PASS  test_light_scaling")
 
 
 # ── Runner ────────────────────────────────────────────────────────────────────
@@ -136,7 +173,7 @@ def test_soil_calibration():
 if __name__ == "__main__":
     failures = 0
     tests = [test_ph_calibration, test_ec_ntc, test_ec_temp_compensation,
-             test_soil_calibration]
+             test_soil_calibration, test_probe_temp, test_light_scaling]
     for t in tests:
         try:
             t()

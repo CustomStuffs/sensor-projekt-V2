@@ -240,7 +240,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": ""
+      "sch_revision": "V2.0"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -495,7 +495,7 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.2,
+        "clearance": 0.15,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -511,6 +511,63 @@
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 2.0,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "MAINS",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 3.0,
+        "tuning_profile": "",
+        "via_diameter": 1.6,
+        "via_drill": 0.8,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.15,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Power",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 1,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.5,
+        "tuning_profile": "",
+        "via_diameter": 1.0,
+        "via_drill": 0.5,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.15,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "VSYS",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.8,
+        "tuning_profile": "",
+        "via_diameter": 1.0,
+        "via_drill": 0.5,
+        "wire_width": 6
       }
     ],
     "meta": {
@@ -518,7 +575,60 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "MAINS",
+        "pattern": "/K1_COM"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K1_NO"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K1_NC"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K1_SNUB"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K2_COM"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K2_NO"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K2_NC"
+      },
+      {
+        "netclass": "MAINS",
+        "pattern": "/K2_SNUB"
+      },
+      {
+        "netclass": "VSYS",
+        "pattern": "/VSYS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/GND"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/GND_ANA"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/3V3_DIG"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/3V3_ANA"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
@@ -526,6 +636,7 @@
       "netlist": "",
       "plot": "",
       "specctra_dsn": "",
+      "step": "",
       "vrml": ""
     },
     "page_layout_descr_file": ""
@@ -650,13 +761,18 @@
       {
         "filename": "sensor_hub.kicad_sch",
         "name": "sensor_hub",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "9b8dc3b9-e16c-e404-9a51-89bfb81076d7"
       }
     ],
     "used_designators": "",
     "variants": []
   },
-  "sheets": [],
+  "sheets": [
+    [
+      "9b8dc3b9-e16c-e404-9a51-89bfb81076d7",
+      "sensor_hub"
+    ]
+  ],
   "text_variables": {},
   "tuning_profiles": {
     "meta": {

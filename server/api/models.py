@@ -22,6 +22,7 @@ class SensorReading(BaseModel):
     soil_pct: Optional[float] = None
     motion: Optional[bool] = None
     water_level: Optional[float] = None
+    probe_temp_c: Optional[float] = None
 
 
 class ReadingsUpload(BaseModel):
@@ -36,10 +37,14 @@ class ReadingsUploadResponse(BaseModel):
     stored: int
 
 
+RelayNo = Literal[1, 2]   # on-board relays: 1 = K1 (GP10), 2 = K2 (GP15)
+
+
 class CommandRequest(BaseModel):
     device_id: str
     action: Literal["relay_on", "relay_off"]
     duration_s: Optional[int] = None
+    relay: RelayNo = 1
 
 
 class CommandResponse(BaseModel):
@@ -51,6 +56,7 @@ class CommandItem(BaseModel):
     id: int
     action: str
     duration_s: Optional[int] = None
+    relay: int = 1
 
 
 class CommandListResponse(BaseModel):

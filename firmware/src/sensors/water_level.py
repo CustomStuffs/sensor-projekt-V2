@@ -1,8 +1,10 @@
-"""IR optical liquid level sensor (e.g. FS-IR1901D) on a digital GPIO pin.
+"""Float switch on Wago W4 (J5): GP16, internal pull-up.
 
-Wiring: power from VBUS (5V), signal wire to cfg["pin"] with PULL_UP.
-NPN open-collector output: pulled LOW when liquid detected, HIGH in air.
-Returns 1.0 if liquid present, 0.0 if dry, None on error.
+Wiring: the switch's two wires go to W4 pin 2 (GND) and pin 3 (GP16); pin 1 stays empty.
+Contact closed pulls GP16 LOW = water present. Mount (or flip) the float so the
+contact closes when the tank has water. Any open-collector / open-drain level
+sensor that pulls LOW on liquid works the same way.
+Returns 1.0 if water present, 0.0 if dry, None on error.
 """
 
 from machine import Pin

@@ -6,20 +6,34 @@ let _schedule = [];
 export function initRelay(getDeviceId) {
   _getDeviceId = getDeviceId;
 
-  document.getElementById("btn-relay-on").addEventListener("click", async () => {
-    const id = _getDeviceId();
-    if (!id) return;
-    const duration = parseInt(document.getElementById("relay-duration").value, 10) || 300;
-    await api.relayOn(id, duration);
-    flash("Relay ON command queued");
-  });
+  document.querySelectorAll(".btn-relay-on").forEach(btn =>
+    btn.addEventListener("click", async () => {
+      const id = _getDeviceId();
+      if (!id) return;
+      const relay = parseInt(btn.dataset.relay, 10);
+      const duration = parseInt(document.getElementById("relay-duration").value, 10) || 300;
+      try {
+        await api.relayOn(id, relay, duration);
+        flash(`Relay ${relay} ON command queued`, "ok", "relay-status");
+      } catch (e) {
+        flash("Command failed: " + e.message, "err", "relay-status");
+      }
+    })
+  );
 
-  document.getElementById("btn-relay-off").addEventListener("click", async () => {
-    const id = _getDeviceId();
-    if (!id) return;
-    await api.relayOff(id);
-    flash("Relay OFF command queued");
-  });
+  document.querySelectorAll(".btn-relay-off").forEach(btn =>
+    btn.addEventListener("click", async () => {
+      const id = _getDeviceId();
+      if (!id) return;
+      const relay = parseInt(btn.dataset.relay, 10);
+      try {
+        await api.relayOff(id, relay);
+        flash(`Relay ${relay} OFF command queued`, "ok", "relay-status");
+      } catch (e) {
+        flash("Command failed: " + e.message, "err", "relay-status");
+      }
+    })
+  );
 
   document.getElementById("slot-condition").addEventListener("change", (e) => {
     const show = e.target.value === "soil";
@@ -54,7 +68,7 @@ function renderSchedule() {
   tbody.innerHTML = "";
 
   if (_schedule.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No schedule entries yet.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No schedule entries yet.</td></tr>';
     return;
   }
 
@@ -65,6 +79,7 @@ function renderSchedule() {
       : "—";
     const tr = document.createElement("tr");
     tr.innerHTML = `
+      <td>${slot.relay ?? 1}</td>
       <td>${slot.time}</td>
       <td>${duration}</td>
       <td class="days-cell">${dayBadges(slot.days)}</td>
@@ -95,7 +110,8 @@ function addSlot() {
   if (!time)         return flash("Set a time first", "err");
   if (!days.length)  return flash("Select at least one day", "err");
 
-  const slot = { time, duration_s: durationMin * 60, days, skip_if: null };
+  const relay = parseInt(document.getElementById("slot-relay").value, 10) || 1;
+  const slot = { time, duration_s: durationMin * 60, days, skip_if: null, relay };
 
   const condType = document.getElementById("slot-condition").value;
   if (condType === "soil") {
@@ -120,11 +136,11 @@ async function saveSchedule() {
   }
 }
 
-function flash(msg, type = "ok") {
+function flash(msg, type = "ok", target = "schedule-status") {
   const el = document.createElement("p");
   el.textContent = msg;
   el.className = "flash " + type;
-  const status = document.getElementById("schedule-status");
+  const status = document.getElementById(target);
   status.appendChild(el);
   setTimeout(() => el.remove(), 4000);
 }

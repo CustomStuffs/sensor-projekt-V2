@@ -16,9 +16,9 @@ async def post_command(req: CommandRequest):
         (req.device_id, now)
     )
     async with db.execute(
-        "INSERT INTO commands(device_id, action, duration_s, created_at)"
-        " VALUES(?, ?, ?, ?)",
-        (req.device_id, req.action, req.duration_s, now)
+        "INSERT INTO commands(device_id, action, duration_s, relay, created_at)"
+        " VALUES(?, ?, ?, ?, ?)",
+        (req.device_id, req.action, req.duration_s, req.relay, now)
     ) as cur:
         cmd_id = cur.lastrowid
     await db.commit()
@@ -29,7 +29,7 @@ async def post_command(req: CommandRequest):
 async def get_commands(device_id: str):
     db = await get_db()
     async with db.execute(
-        "SELECT id, action, duration_s FROM commands"
+        "SELECT id, action, duration_s, relay FROM commands"
         " WHERE device_id = ? AND acked_at IS NULL ORDER BY created_at ASC",
         (device_id,)
     ) as cur:

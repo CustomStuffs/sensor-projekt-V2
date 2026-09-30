@@ -14,3 +14,7 @@ readings.json
 
 # Claude Code local config
 .claude/commands/
+
+# vendor 3D models: not redistributable, see hardware/kicad/3d/README.md
+hardware/kicad/3d/*
+!hardware/kicad/3d/README.md
